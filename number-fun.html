@@ -1,0 +1,1064 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Number Fun | Mini Gamers Club</title>
+    <!-- Google Font: Nunito -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #FF9AA2;
+            --secondary: #FFB7B2;
+            --accent: #FFDAC1;
+            --success: #B5EAD7;
+            --info: #C7CEEA;
+            --bg-gradient: linear-gradient(135deg, #FFDEE9 0%, #B5FFFC 100%);
+            --card-bg: rgba(255, 255, 255, 0.95);
+            --text-dark: #555;
+            --text-light: #888;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Nunito', sans-serif;
+            background: var(--bg-gradient);
+            height: 100vh;
+            color: var(--text-dark);
+            overflow: hidden;
+            /* No scrolling for game */
+            display: flex;
+            flex-direction: column;
+            width: 100%;
+            touch-action: none;
+        }
+
+        /* Floating bubbles background (Visuals) */
+        .bubbles {
+            position: fixed;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            overflow: hidden;
+            top: 0;
+            left: 0;
+            pointer-events: none;
+        }
+
+        .bubble {
+            position: absolute;
+            bottom: -100px;
+            width: 40px;
+            height: 40px;
+            background: rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            opacity: 0.5;
+            animation: rise 15s infinite ease-in;
+        }
+
+        @keyframes rise {
+            0% {
+                bottom: -100px;
+                transform: translateX(0);
+            }
+
+            50% {
+                transform: translateX(100px);
+            }
+
+            100% {
+                bottom: 110vh;
+                transform: translateX(-200px);
+            }
+        }
+
+        /* Bubbles manual positioning */
+        .bubble:nth-child(1) {
+            width: 40px;
+            height: 40px;
+            left: 10%;
+            animation-duration: 8s;
+        }
+
+        .bubble:nth-child(2) {
+            width: 20px;
+            height: 20px;
+            left: 20%;
+            animation-duration: 5s;
+            animation-delay: 1s;
+        }
+
+        .bubble:nth-child(3) {
+            width: 50px;
+            height: 50px;
+            left: 35%;
+            animation-duration: 7s;
+            animation-delay: 2s;
+        }
+
+        .bubble:nth-child(4) {
+            width: 80px;
+            height: 80px;
+            left: 50%;
+            animation-duration: 11s;
+            animation-delay: 0s;
+        }
+
+        .bubble:nth-child(5) {
+            width: 35px;
+            height: 35px;
+            left: 55%;
+            animation-duration: 6s;
+            animation-delay: 1s;
+        }
+
+        /* Top Bar */
+        .top-bar {
+            background: rgba(255, 255, 255, 0.95);
+            padding: 10px 15px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            justify-content: center;
+            z-index: 100;
+        }
+
+        .top-bar button {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 20px;
+            font-family: inherit;
+            font-size: 0.9rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.2s;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+
+        .top-bar button:active {
+            transform: scale(0.95);
+        }
+
+        .btn-home {
+            background: var(--primary);
+            color: white;
+        }
+
+        .btn-toggle {
+            background: var(--info);
+            color: white;
+        }
+
+        .btn-toggle.off {
+            background: #ccc;
+            color: #666;
+        }
+
+        /* Exact styles from image */
+        .btn-home {
+            background: #FF9AA2 !important;
+            /* Pink */
+            color: white !important;
+            padding: 8px 20px !important;
+        }
+
+        .btn-toggle {
+            background: #C7CEEA !important;
+            /* Periwinkle Blue */
+            color: white !important;
+            padding: 8px 20px !important;
+        }
+
+        /* Game Container */
+        .game-container {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: space-evenly;
+            padding: 10px;
+            width: 100%;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .game-title {
+            font-size: 2rem;
+            font-weight: 800;
+            color: #4D79FF;
+            /* Blueish for variety */
+            margin-bottom: 5px;
+            text-shadow: 2px 2px 0px rgba(0, 0, 0, 0.05);
+        }
+
+        /* Mascot Styles */
+        .mascot-container {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            /* Space between mascot and text */
+        }
+
+        .mascot-wrapper {
+            position: relative;
+            width: 60px;
+            height: 60px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 3rem;
+            background: white;
+            border-radius: 50%;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            border: 3px solid #FFD700;
+            transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            cursor: pointer;
+            z-index: 10;
+        }
+
+        .mascot-wrapper:hover {
+            transform: scale(1.1) rotate(5deg);
+        }
+
+        .mascot-wrapper.bouncing {
+            animation: bounce 0.6s infinite alternate;
+        }
+
+        .mascot-wrapper.wiggling {
+            animation: wiggle 0.4s ease-in-out 2;
+        }
+
+        @keyframes bounce {
+            from {
+                transform: translateY(0);
+            }
+
+            to {
+                transform: translateY(-10px);
+            }
+        }
+
+        @keyframes wiggle {
+
+            0%,
+            100% {
+                transform: rotate(0deg);
+            }
+
+            25% {
+                transform: rotate(-10deg);
+            }
+
+            75% {
+                transform: rotate(10deg);
+            }
+        }
+
+        .mascot-bubble {
+            position: absolute;
+            top: -10px;
+            right: -10px;
+            background: #FF4081;
+            color: white;
+            font-size: 1rem;
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+            opacity: 0;
+            transform: scale(0);
+            transition: all 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+        }
+
+        .mascot-bubble.show {
+            opacity: 1;
+            transform: scale(1);
+        }
+
+        h1 {
+            margin: 0;
+            /* Remove default margin to align better in flex */
+            line-height: 1.2;
+        }
+
+        header {
+            padding-top: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .app-container {
+            position: relative;
+            z-index: 1;
+            min-height: calc(100vh - 60px);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .game-wrapper {
+            flex: 1;
+            width: 100%;
+            max-width: 600px;
+            padding: 10px 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .star-buddy {
+            position: relative;
+            display: inline-block;
+        }
+
+        .mascot {
+            width: 50px;
+            height: 50px;
+            font-size: 2.5rem;
+            background: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+            border: 3px solid #FFD700;
+            transition: transform 0.2s;
+        }
+
+        .mascot-bubble {
+            position: absolute;
+            top: -5px;
+            right: -5px;
+            background: #FF4081;
+            color: white;
+            font-size: 0.9rem;
+            min-width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 2px 6px;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+        }
+
+        .controls {
+            margin-top: 10px;
+            display: flex;
+            gap: 15px;
+            background: rgba(255, 255, 255, 0.2);
+            padding: 10px 20px;
+            border-radius: 20px;
+            backdrop-filter: blur(5px);
+        }
+
+        .mode-btn {
+            background: transparent;
+            border: 2px solid transparent;
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-weight: 800;
+            color: var(--text-light);
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .mode-btn.active {
+            background: #4D79FF;
+            color: white;
+            box-shadow: 0 4px 10px rgba(77, 121, 255, 0.3);
+        }
+
+        .repeat-btn {
+            background: #fff8e1 !important;
+            border: 2px solid #ffe082 !important;
+            color: #ffb300 !important;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            font-size: 1.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+
+        .score-text {
+            font-size: 1.2rem;
+            color: #4D79FF;
+            font-weight: bold;
+        }
+
+        /* Question Section */
+        .question-box {
+            text-align: center;
+            margin: 10px 0;
+            animation: popIn 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        .question-text {
+            font-size: 3rem;
+            font-weight: 900;
+            color: var(--text-dark);
+            background: white;
+            padding: 20px 40px;
+            border-radius: 20px;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+            display: inline-block;
+            min-width: 200px;
+        }
+
+        .instruction-text {
+            font-size: 1.2rem;
+            margin-top: 10px;
+            color: var(--text-light);
+        }
+
+        /* Answer Grid */
+        .answer-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 20px;
+            width: 90%;
+            max-width: 400px;
+        }
+
+        .number-btn {
+            background: white;
+            border: none;
+            border-radius: 20px;
+            aspect-ratio: 1.2 / 1;
+            /* Slightly wider than square */
+            font-size: 2.5rem;
+            font-weight: 800;
+            color: var(--text-dark);
+            cursor: pointer;
+            box-shadow: 0 6px 0 #E0E0E0, 0 10px 10px rgba(0, 0, 0, 0.1);
+            transition: transform 0.1s, box-shadow 0.1s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .number-btn:active {
+            transform: translateY(6px);
+            box-shadow: 0 0 0 #E0E0E0, 0 0 0 rgba(0, 0, 0, 0.1);
+        }
+
+        .number-btn:disabled {
+            opacity: 0.7;
+            cursor: default;
+        }
+
+        /* Button Colors (Subtle pastel variety) */
+        .number-btn:nth-child(1) {
+            color: #FF9AA2;
+        }
+
+        .number-btn:nth-child(2) {
+            color: #9C88FF;
+        }
+
+        .number-btn:nth-child(3) {
+            color: #4DCC88;
+        }
+
+        .number-btn:nth-child(4) {
+            color: #FFD93D;
+        }
+
+        /* Win Modal */
+        .win-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.6);
+            backdrop-filter: blur(4px);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 2000;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s;
+        }
+
+        .win-overlay.visible {
+            opacity: 1;
+            pointer-events: all;
+        }
+
+        .win-modal {
+            background: white;
+            padding: 30px;
+            border-radius: 25px;
+            text-align: center;
+            width: 90%;
+            max-width: 320px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            transform: scale(0.8);
+            transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        .win-overlay.visible .win-modal {
+            transform: scale(1);
+        }
+
+        .win-modal h2 {
+            font-size: 2rem;
+            color: var(--primary);
+            margin-bottom: 10px;
+        }
+
+        .win-modal p {
+            font-size: 1.2rem;
+            color: #666;
+            margin-bottom: 20px;
+        }
+
+        .modal-btn {
+            width: 100%;
+            padding: 12px;
+            margin: 8px 0;
+            border: none;
+            border-radius: 12px;
+            font-size: 1.1rem;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .btn-restart {
+            background: var(--success);
+            color: #fff;
+        }
+
+        .btn-menu {
+            background: #f0f0f0;
+            color: #666;
+        }
+
+        @keyframes popIn {
+            0% {
+                transform: scale(0.5);
+                opacity: 0;
+            }
+
+            100% {
+                transform: scale(1);
+                opacity: 1;
+            }
+        }
+
+        @keyframes shake {
+
+            10%,
+            90% {
+                transform: translateX(-4px);
+            }
+
+            20%,
+            80% {
+                transform: translateX(4px);
+            }
+
+            30%,
+            50%,
+            70% {
+                transform: translateX(-6px);
+            }
+
+            40%,
+            60% {
+                transform: translateX(6px);
+            }
+        }
+
+        .shake {
+            animation: shake 0.4s cubic-bezier(.36, .07, .19, .97) both;
+        }
+
+        /* Responsive */
+        @media (max-width: 400px) {
+            .question-text {
+                font-size: 2.5rem;
+                padding: 15px 30px;
+            }
+
+            .number-btn {
+                font-size: 2rem;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Background -->
+    <div class="bubbles">
+        <div class="bubble"></div>
+        <div class="bubble"></div>
+        <div class="bubble"></div>
+        <div class="bubble"></div>
+        <div class="bubble"></div>
+    </div>
+
+    <!-- Top Bar -->
+    <div class="top-bar">
+        <button class="btn-home" onclick="window.location.href='index.html'">🏠 HOME</button>
+        <button id="btnRead" class="btn-toggle" onclick="toggleRead()">📢 READ: ON</button>
+        <button id="btnSound" class="btn-toggle" onclick="toggleSound()">🔊 SOUND: ON</button>
+    </div>
+
+    <!-- Game Area -->
+    <div class="app-container">
+        <div class="game-wrapper">
+            <div style="display: flex; align-items: center; justify-content: center; margin: 15px 0; gap: 15px;">
+
+                <h1>Number Fun!</h1>
+            </div>
+            <div class="game-container">
+                <div class="game-title">Number Fun</div>
+
+                <div class="controls-row">
+                    <button id="modeEasy" class="mode-btn active" onclick="setMode('easy')">EASY</button>
+                    <button id="modeHard" class="mode-btn" onclick="setMode('hard')">HARD</button>
+                    <div style="width:10px"></div>
+                    <button class="repeat-btn" onclick="speakCurrentQuestion()">👂</button>
+                </div>
+
+                <div id="scoreDisplay" class="score-text">Score: 0 / 10</div>
+
+                <div class="question-box">
+                    <div id="questionText" class="question-text">?</div>
+                    <div id="instructionText" class="instruction-text">Tap the correct number!</div>
+                </div>
+
+                <div id="answerGrid" class="answer-grid">
+                    <!-- Buttons injected by JS -->
+                </div>
+            </div>
+        </div>
+        <div id="winOverlay" class="win-overlay">
+            <div class="win-modal">
+                <h2>Great Job! 🎉</h2>
+                <p>Score: 10 / 10</p>
+                <button class="modal-btn btn-restart" onclick="resetGame()">Play Again</button>
+                <button class="modal-btn btn-menu" onclick="goHome()">🏠 Back to Hub</button>
+            </div>
+        </div>
+
+        <script>
+            // CONFIG
+            const GOAL = 10;
+            let score = 0;
+            let targetNumber = 1;
+
+
+            let mode = 'easy'; // 'easy' or 'hard'
+            let currentRound = {
+                target: 0,
+                question: "",
+                instruction: ""
+            };
+
+            // SETTINGS (Shared Persistence)
+            let state = {
+                soundEnabled: true,
+                readEnabled: true
+            };
+
+            function loadSettings() {
+                const saved = localStorage.getItem('miniGamersSettings');
+                if (saved) {
+                    try {
+                        const parsed = JSON.parse(saved);
+                        state.soundEnabled = parsed.soundEnabled;
+                        state.readEnabled = parsed.readAloudEnabled; // Map old key if needed or standardize
+                    } catch (e) {
+                        console.log('Error parsing settings', e);
+                    }
+                }
+            }
+
+            // INIT
+            window.onload = () => {
+                loadSettings();
+                updateSettingsUI();
+                resetGame();
+                // TTS Warmup
+                document.body.addEventListener('click', () => {
+                    if ('speechSynthesis' in window) {
+                        window.speechSynthesis.resume();
+                    }
+                }, {
+                    once: true
+                });
+                // Generate initial numbers and set mascot state
+                generateNumbers(); // Assuming this is the function to generate the number buttons
+
+            };
+
+            function resetGame() {
+                score = 0;
+                updateScore();
+                document.getElementById('winOverlay').classList.remove('visible');
+                generateRound();
+                speak("Welcome to Number Fun! Let's play.");
+            }
+
+            function setMode(newMode) {
+                mode = newMode;
+                document.getElementById('modeEasy').classList.toggle('active', mode === 'easy');
+                document.getElementById('modeHard').classList.toggle('active', mode === 'hard');
+                resetGame();
+            }
+
+            function generateRound() {
+                if (score >= GOAL) {
+                    handleWin();
+                    return;
+                }
+
+                // Logic for Easy vs Hard
+                let numA, numB, answer, questionStr, instructionStr;
+                const maxVal = 10;
+
+                if (mode === 'easy') {
+                    // "Tap the number X" - AUDIO ONLY
+                    answer = Math.floor(Math.random() * (maxVal + 1)); // 0-10
+                    questionStr = "👂"; // Visual is just an ear
+                    instructionStr = `Tap the number ${answer}`;
+                } else {
+                    // HARD: Math Only (Add or Sub)
+                    const isAdd = Math.random() > 0.5;
+                    if (isAdd) {
+                        numA = Math.floor(Math.random() * 7); // 0-6
+                        numB = Math.floor(Math.random() * 6); // 0-5. Max sum 11.
+                        answer = numA + numB;
+                        questionStr = `${numA} + ${numB} = ?`;
+                        instructionStr = `What is ${numA} plus ${numB}?`;
+                    } else {
+                        // Subtraction (Ensure positive)
+                        numA = Math.floor(Math.random() * 11) + 2; // 2-12
+                        numB = Math.floor(Math.random() * numA); // 0 to numA-1
+                        answer = numA - numB;
+                        questionStr = `${numA} - ${numB} = ?`;
+                        instructionStr = `What is ${numA} minus ${numB}?`;
+                    }
+                }
+
+                currentRound = {
+                    target: answer,
+                    question: questionStr,
+                    instruction: instructionStr
+                };
+
+                // Update UI
+                const qEl = document.getElementById('questionText');
+                qEl.textContent = questionStr;
+
+                // Update optional instruction text
+                const iEl = document.getElementById('instructionText');
+                if (mode === 'easy') {
+                    iEl.textContent = "Listen to the number!";
+                } else {
+                    iEl.textContent = "Tap the correct answer!";
+                }
+
+                // Pop animation reset
+                qEl.style.animation = 'none';
+                qEl.offsetHeight; /* trigger reflow */
+                qEl.style.animation = 'popIn 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275)';
+
+                // Generate Answers (1 correct, 3 wrong)
+                let options = new Set([answer]);
+                while (options.size < 4) {
+                    let r = Math.floor(Math.random() * 13); // 0-12
+                    if (r !== answer) options.add(r);
+                }
+                let optionsArr = Array.from(options).sort(() => 0.5 - Math.random());
+
+                // Render Buttons
+                const grid = document.getElementById('answerGrid');
+                grid.innerHTML = '';
+                optionsArr.forEach(num => {
+                    const btn = document.createElement('button');
+                    btn.className = 'number-btn';
+                    btn.textContent = num;
+                    btn.onclick = () => handleAnswer(num, btn);
+                    grid.appendChild(btn);
+                });
+
+                // Speak
+                setTimeout(() => speak(instructionStr), 200);
+            }
+
+            function generateNumbers() {
+                generateRound();
+            }
+
+            function handleAnswer(selected, btnElement) {
+                if (selected === currentRound.target) { // Using currentRound.target for consistency with existing game logic
+                    // Correct!
+
+                    playSound('correct');
+                    // createConfetti(btnElement); // createConfetti function is not provided, commenting out
+                    speak(`That's right! It's the number ${currentRound.target}.`);
+
+                    // Visual feedback
+                    btnElement.style.transform = "scale(1.2) rotate(10deg)";
+                    btnElement.style.background = "#4CAF50";
+                    btnElement.style.borderColor = "#388E3C";
+
+                    score++; // Increment score for the original game logic
+                    updateScore();
+
+                    setTimeout(() => {
+                        // targetNumber++; // This was for a different game mode, not compatible with currentRound.target
+                        // if (targetNumber > 10) targetNumber = 1;
+                        generateRound(); // Call generateRound for the next question
+
+                    }, 800); // Reduced timeout for faster game flow
+                } else {
+                    // Wrong
+
+                    playSound('wrong');
+                    speak(`Oops! Try again.`);
+
+                    btnElement.classList.add('shake');
+                    btnElement.style.background = "#FF5252";
+                    setTimeout(() => {
+                        btnElement.classList.remove('shake');
+                        btnElement.style.background = "white";
+
+                    }, 1000);
+                }
+            }
+
+            function updateScore() {
+                document.getElementById('scoreDisplay').textContent = `Score: ${score} / ${GOAL}`;
+            }
+
+            function handleWin() {
+                playSound('success');
+                document.getElementById('winOverlay').classList.add('visible');
+                speak("Great job! You finished the game!");
+            }
+
+            function speakCurrentQuestion() {
+                speak(currentRound.instruction);
+            }
+
+            // --- SHARED AUDIO/TTS LOGIC (From index.html) ---
+
+            function toggleRead() {
+                state.readEnabled = !state.readEnabled;
+                saveSettings();
+                updateSettingsUI();
+            }
+
+            function toggleSound() {
+                state.soundEnabled = !state.soundEnabled;
+                saveSettings();
+                updateSettingsUI();
+            }
+
+            function saveSettings() {
+                localStorage.setItem('miniGamersSettings', JSON.stringify({
+                    soundEnabled: state.soundEnabled,
+                    readAloudEnabled: state.readEnabled
+                }));
+            }
+
+            function updateSettingsUI() {
+                const btnT = document.getElementById('btnRead');
+                const btnS = document.getElementById('btnSound');
+
+                if (state.readEnabled) {
+                    btnT.textContent = "📖 Read On";
+                    btnT.classList.remove('off');
+                } else {
+                    btnT.textContent = "📖 Read Off";
+                    btnT.classList.add('off');
+                }
+
+                if (state.soundEnabled) {
+                    btnS.textContent = "🔊 Sound On";
+                    btnS.classList.remove('off');
+                } else {
+                    btnS.textContent = "🔊 Sound Off";
+                    btnS.classList.add('off');
+                }
+            }
+
+            function goHome() {
+                window.location.href = 'index.html';
+            }
+
+            // ==========================================
+            // ROBUST AUDIO & TTS SYSTEM (Fixed for Mac/iOS)
+            // ==========================================
+
+            // Global State for Audio
+            let isTTSUnlocked = false;
+            let speakQueue = [];
+            let voicesLoaded = false;
+
+            // Create Global Context once
+            const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+            let globalAudioCtx = new AudioContextClass();
+
+            function initTTS() {
+                if ('speechSynthesis' in window) {
+                    // Pre-check voices
+                    if (window.speechSynthesis.getVoices().length > 0) {
+                        voicesLoaded = true;
+                    }
+                    window.speechSynthesis.onvoiceschanged = () => {
+                        console.log("🔊 Voices loaded/updated");
+                        voicesLoaded = true;
+                    };
+                }
+            }
+            // Run Audio Init
+            initTTS();
+
+            // Unlock Function (Run on first touch)
+            function unlockAudio() {
+                // 1. Resume Web Audio
+                if (globalAudioCtx.state === 'suspended') {
+                    globalAudioCtx.resume().then(() => console.log("🔊 Audio Context Resumed"));
+                }
+
+                // 2. Unlock TTS
+                if (!isTTSUnlocked && window.speechSynthesis) {
+                    isTTSUnlocked = true;
+                    console.log("🔓 Unlocking TTS...");
+
+                    // Prime with silence (crucial for iOS)
+                    const empty = new SpeechSynthesisUtterance(" ");
+                    empty.volume = 0;
+                    window.speechSynthesis.speak(empty);
+
+                    if (window.speechSynthesis.paused) {
+                        window.speechSynthesis.resume();
+                    }
+
+                    // Process Queue (play delayed welcome message)
+                    setTimeout(processSpeakQueue, 100);
+                }
+            }
+
+            // Attach Unlock Listeners (Global)
+            document.body.addEventListener('touchstart', unlockAudio, { once: true });
+            document.body.addEventListener('click', unlockAudio, { once: true });
+
+            // Robust Speak Function
+            function speak(text) {
+                if (!state.readEnabled) return; // Respect local game settings
+                if (!('speechSynthesis' in window)) return;
+
+                // 1. Queue if locked
+                if (!isTTSUnlocked) {
+                    console.log("🔒 TTS locked, queuing:", text);
+                    speakQueue.push(text);
+                    return;
+                }
+
+                // 2. Prepare System
+                window.speechSynthesis.cancel();
+                if (window.speechSynthesis.paused) window.speechSynthesis.resume();
+
+                // 3. Process Text
+                const processedText = text.replace(/\.\.\./g, ' ');
+                const utter = new SpeechSynthesisUtterance(processedText);
+                utter.rate = 0.9;
+                utter.lang = 'en-US';
+
+                // 4. Voice Selection
+                const voices = window.speechSynthesis.getVoices();
+                if (voices.length > 0) {
+                    let preferredVoice = voices.find(v =>
+                        (v.name.includes('Samantha') || v.name.includes('Google US English') || v.name.includes('Zira'))
+                        && v.lang.startsWith('en')
+                    );
+                    if (!preferredVoice) preferredVoice = voices.find(v => v.lang.startsWith('en'));
+                    if (preferredVoice) utter.voice = preferredVoice;
+                }
+
+                // 5. Speak
+                // Garbage Collection Fix
+                window.currentUtterance = utter;
+                utter.onend = () => { window.currentUtterance = null; };
+
+                window.speechSynthesis.speak(utter);
+                if (window.speechSynthesis.paused) window.speechSynthesis.resume();
+            }
+
+            // Queue Processor
+            function processSpeakQueue() {
+                if (speakQueue.length === 0) return;
+                // Play the first queued message (usually "Welcome") and clear rest
+                // This prevents spamming if user tapped multiple times quickly
+                const text = speakQueue.shift();
+                speakQueue = [];
+                speak(text);
+            }
+
+            // Web Audio API (Using Global Context)
+            function playSound(type) {
+                if (!state.soundEnabled) return;
+
+                // Ensure context is running
+                if (globalAudioCtx.state === 'suspended') globalAudioCtx.resume();
+
+                try {
+                    const oscillator = globalAudioCtx.createOscillator();
+                    const gainNode = globalAudioCtx.createGain();
+
+                    let frequency = 440;
+                    let waveType = 'sine';
+
+                    if (type === 'correct') {
+                        frequency = 880;
+                        waveType = 'triangle';
+                    } else if (type === 'wrong') {
+                        frequency = 200;
+                        waveType = 'sawtooth';
+                    } else if (type === 'success') {
+                        frequency = 1200;
+                        waveType = 'sine';
+                    }
+
+                    oscillator.type = waveType;
+                    oscillator.frequency.value = frequency;
+                    oscillator.connect(gainNode);
+                    gainNode.connect(globalAudioCtx.destination);
+
+                    gainNode.gain.setValueAtTime(0.1, globalAudioCtx.currentTime);
+                    oscillator.start();
+                    oscillator.stop(globalAudioCtx.currentTime + (type === 'success' ? 0.6 : 0.15));
+                } catch (e) {
+                    console.warn("Audio error", e);
+                }
+            }
+        </script>
+</body>
+
+</html>

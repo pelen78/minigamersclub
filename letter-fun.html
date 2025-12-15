@@ -1,0 +1,942 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Letter Fun (ABC) - Mini Gamers Club</title>
+    <!-- Google Font: Nunito -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #FF9AA2;
+            --secondary: #FFB7B2;
+            --accent: #FFDAC1;
+            --success: #B5EAD7;
+            --info: #C7CEEA;
+            --bg-gradient: linear-gradient(135deg, #FFDEE9 0%, #B5FFFC 100%);
+            --card-bg: rgba(255, 255, 255, 0.95);
+            --text-dark: #555;
+            --text-light: #888;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            user-select: none;
+            -webkit-user-select: none;
+        }
+
+        html,
+        body {
+            height: 100%;
+            overflow: hidden;
+        }
+
+        body {
+            font-family: 'Nunito', sans-serif;
+            background: var(--bg-gradient);
+            color: var(--text-dark);
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Floating bubbles background */
+        .bubbles {
+            position: fixed;
+            width: 100%;
+            height: 100%;
+            z-index: 0;
+            overflow: hidden;
+            top: 0;
+            left: 0;
+            pointer-events: none;
+        }
+
+        .bubble {
+            position: absolute;
+            bottom: -100px;
+            width: 40px;
+            height: 40px;
+            background: rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            opacity: 0.5;
+            animation: rise 15s infinite ease-in;
+        }
+
+        @keyframes rise {
+            0% {
+                bottom: -100px;
+                transform: translateX(0);
+            }
+
+            50% {
+                transform: translateX(100px);
+            }
+
+            100% {
+                bottom: 110vh;
+                transform: translateX(-200px);
+            }
+        }
+
+        .bubble:nth-child(1) {
+            left: 10%;
+            width: 50px;
+            height: 50px;
+            animation-duration: 10s;
+        }
+
+        .bubble:nth-child(2) {
+            left: 40%;
+            width: 30px;
+            height: 30px;
+            animation-duration: 7s;
+            animation-delay: 2s;
+        }
+
+        .bubble:nth-child(3) {
+            left: 70%;
+            width: 70px;
+            height: 70px;
+            animation-duration: 13s;
+        }
+
+        .bubble:nth-child(4) {
+            left: 85%;
+            width: 40px;
+            height: 40px;
+            animation-duration: 9s;
+            animation-delay: 3s;
+        }
+
+        .app-container {
+            position: relative;
+            z-index: 1;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        /* Top Bar */
+        .top-bar {
+            background: rgba(255, 255, 255, 0.9);
+            padding: 8px 15px;
+            display: flex;
+            justify-content: center;
+            gap: 8px;
+            flex-wrap: wrap;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+            flex-shrink: 0;
+        }
+
+        .btn {
+            padding: 6px 14px;
+            border: none;
+            border-radius: 20px;
+            font-family: inherit;
+            font-weight: 700;
+            font-size: 0.85rem;
+            cursor: pointer;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            transition: transform 0.1s;
+        }
+
+        .btn:active {
+            transform: scale(0.95);
+        }
+
+        .btn-home {
+            background: var(--primary);
+            color: white;
+        }
+
+        .btn-toggle {
+            background: var(--info);
+            color: white;
+        }
+
+        .btn-toggle.off {
+            background: #ddd;
+            color: #777;
+        }
+
+        /* Game Area */
+        .game-wrapper {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 15px;
+            overflow: hidden;
+        }
+
+        h1 {
+            color: var(--primary);
+            font-size: 2rem;
+            margin-bottom: 5px;
+            text-shadow: 2px 2px 0px white;
+        }
+
+        .score-board {
+            font-size: 1.3rem;
+            font-weight: 800;
+            color: var(--text-dark);
+            margin: 8px 0;
+            background: white;
+            padding: 6px 20px;
+            border-radius: 50px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .controls {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 10px;
+        }
+
+        .mode-btn {
+            padding: 6px 16px;
+            background: white;
+            border: 2px solid transparent;
+            color: #888;
+            border-radius: 20px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .mode-btn.active {
+            border-color: var(--primary);
+            color: var(--primary);
+            background: #fff0f1;
+        }
+
+        .instruction-area {
+            text-align: center;
+            margin: 10px 0;
+            min-height: 60px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .instruction {
+            font-size: 1.3rem;
+            font-weight: 700;
+            color: var(--text-dark);
+        }
+
+        .target-letter {
+            font-size: 2.5rem;
+            font-weight: 900;
+            color: var(--primary);
+            background: white;
+            padding: 8px 25px;
+            border-radius: 15px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .hear-again-btn {
+            padding: 8px 16px;
+            background: #fff8e1;
+            border: 2px solid #ffe082;
+            color: #ffb300;
+            border-radius: 20px;
+            font-weight: 700;
+            cursor: pointer;
+            font-size: 1.2rem;
+            transition: transform 0.1s;
+        }
+
+        .hear-again-btn:active {
+            transform: scale(0.95);
+        }
+
+        /* Letter Grid */
+        .letter-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 10px;
+            width: 100%;
+            max-width: 500px;
+            margin: 10px auto;
+        }
+
+        @media (min-width: 600px) {
+            .letter-grid {
+                grid-template-columns: repeat(6, 1fr);
+                max-width: 600px;
+            }
+        }
+
+        .letter-btn {
+            aspect-ratio: 1;
+            background: white;
+            border: 3px solid var(--accent);
+            border-radius: 15px;
+            font-size: 2rem;
+            font-weight: 900;
+            color: var(--text-dark);
+            cursor: pointer;
+            transition: all 0.2s;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .letter-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.15);
+        }
+
+        .letter-btn:active {
+            transform: scale(0.95);
+        }
+
+        .letter-btn.correct {
+            animation: bounceCorrect 0.5s ease;
+            background: var(--success);
+            border-color: #7fd3b8;
+        }
+
+        .letter-btn.wrong {
+            animation: shakeWrong 0.4s ease;
+        }
+
+        @keyframes bounceCorrect {
+
+            0%,
+            100% {
+                transform: scale(1);
+            }
+
+            50% {
+                transform: scale(1.2);
+            }
+        }
+
+        @keyframes shakeWrong {
+
+            0%,
+            100% {
+                transform: translateX(0);
+            }
+
+            25% {
+                transform: translateX(-10px);
+            }
+
+            75% {
+                transform: translateX(10px);
+            }
+        }
+
+        /* Mascot Animations */
+        .star-buddy {
+            width: 48px;
+            height: 48px;
+            margin-right: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            animation: floaty 2.8s ease-in-out infinite;
+            position: relative;
+        }
+
+        .mascot {
+            font-size: 38px;
+            line-height: 1;
+            filter: drop-shadow(0 4px 6px rgba(0, 0, 0, 0.1));
+            cursor: default;
+        }
+
+        .mascot-bubble {
+            position: absolute;
+            bottom: 100%;
+            left: 50%;
+            transform: translateX(-50%);
+            background: white;
+            padding: 4px 8px;
+            border-radius: 10px;
+            font-size: 0.9rem;
+            margin-bottom: 5px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            min-width: 20px;
+            text-align: center;
+            font-weight: 800;
+            color: #555;
+            white-space: nowrap;
+            z-index: 10;
+        }
+
+        .mascot-bubble::after {
+            content: '';
+            position: absolute;
+            bottom: -5px;
+            left: 50%;
+            transform: translateX(-50%);
+            border-width: 5px 5px 0;
+            border-style: solid;
+            border-color: white transparent transparent transparent;
+        }
+
+        @keyframes floaty {
+
+            0%,
+            100% {
+                transform: translateY(0);
+            }
+
+            50% {
+                transform: translateY(-5px);
+            }
+        }
+
+        .mascot-bounce {
+            animation: mascotBounce 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        @keyframes mascotBounce {
+            0% {
+                transform: translateY(0) scale(1);
+            }
+
+            30% {
+                transform: translateY(-10px) scale(1.1);
+            }
+
+            100% {
+                transform: translateY(0) scale(1);
+            }
+        }
+
+        .mascot-wiggle {
+            animation: mascotWiggle 0.5s ease-in-out;
+        }
+
+        @keyframes mascotWiggle {
+
+            0%,
+            100% {
+                transform: rotate(0);
+            }
+
+            25% {
+                transform: rotate(-10deg);
+            }
+
+            75% {
+                transform: rotate(10deg);
+            }
+        }
+
+        /* Win Modal */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 100;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s;
+        }
+
+        .modal-overlay.visible {
+            opacity: 1;
+            pointer-events: all;
+        }
+
+        .modal {
+            background: white;
+            padding: 30px;
+            border-radius: 20px;
+            text-align: center;
+            width: 90%;
+            max-width: 350px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+            transform: scale(0.8);
+            transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        .modal-overlay.visible .modal {
+            transform: scale(1);
+        }
+
+        .modal h2 {
+            font-size: 2rem;
+            margin-bottom: 10px;
+            color: var(--primary);
+        }
+
+        .modal p {
+            font-size: 1.2rem;
+            color: #666;
+            margin-bottom: 25px;
+        }
+
+        .modal-btn {
+            display: block;
+            width: 100%;
+            padding: 12px;
+            margin: 10px 0;
+            border-radius: 12px;
+            font-size: 1.1rem;
+            border: none;
+            cursor: pointer;
+            font-weight: 700;
+        }
+
+        .btn-play-again {
+            background: var(--success);
+            color: #333;
+        }
+
+        .btn-menu {
+            background: #eee;
+            color: #555;
+        }
+
+        /* Responsive */
+        @media (max-height: 700px) {
+            h1 {
+                font-size: 1.5rem;
+            }
+
+            .score-board {
+                font-size: 1rem;
+                padding: 4px 15px;
+            }
+
+            .instruction {
+                font-size: 1.1rem;
+            }
+
+            .target-letter {
+                font-size: 2rem;
+                padding: 6px 20px;
+            }
+
+            .letter-btn {
+                font-size: 1.5rem;
+            }
+
+            .letter-grid {
+                gap: 8px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Background Bubbles -->
+    <div class="bubbles">
+        <div class="bubble"></div>
+        <div class="bubble"></div>
+        <div class="bubble"></div>
+        <div class="bubble"></div>
+    </div>
+
+    <div class="app-container">
+        <!-- Top Navigation -->
+        <div class="top-bar">
+            <button class="btn btn-home" onclick="window.location.href='index.html'">🏠 HOME</button>
+            <button id="btnRead" class="btn btn-toggle" onclick="toggleRead()">📢 READ: ON</button>
+            <button id="btnSound" class="btn btn-toggle" onclick="toggleSound()">🔊 SOUND: ON</button>
+        </div>
+
+        <div class="game-wrapper">
+            <h1>Letter Fun (ABC)</h1>
+
+            <div id="scoreDisplay" class="score-board">Score: 0 / 10</div>
+
+            <div class="instruction-area">
+
+                <div id="instruction" class="instruction">Listen and tap the letter!</div>
+                <button class="hear-again-btn" onclick="repeatInstruction()">👂</button>
+            </div>
+
+            <div id="letterGrid" class="letter-grid">
+                <!-- Letter buttons injected here -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Win Modal -->
+    <div id="winModal" class="modal-overlay">
+        <div class="modal">
+            <h2>Great Job! 🎉</h2>
+            <p id="finalScoreText">Score: 10 / 10</p>
+            <button class="modal-btn btn-play-again" onclick="restartGame()">Play Again</button>
+            <button class="modal-btn btn-menu" onclick="window.location.href='index.html'">Back to Hub</button>
+        </div>
+    </div>
+
+    <script>
+        // --- Game Config ---
+        const ALPHABET = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('');
+
+        // Simple phonics map (letter -> sound description)
+        const PHONICS = {
+            'A': 'ah', 'B': 'buh', 'C': 'kuh', 'D': 'duh', 'E': 'eh',
+            'F': 'ff', 'G': 'guh', 'H': 'huh', 'I': 'ih', 'J': 'juh',
+            'K': 'kuh', 'L': 'll', 'M': 'mm', 'N': 'nn', 'O': 'oh',
+            'P': 'puh', 'Q': 'kwuh', 'R': 'rr', 'S': 'ss', 'T': 'tuh',
+            'U': 'uh', 'V': 'vv', 'W': 'wuh', 'X': 'ks', 'Y': 'yuh', 'Z': 'zz'
+        };
+
+        let state = {
+            score: 0,
+            targetLetter: '',
+            currentOptions: [],
+            isLocked: false,
+            soundEnabled: true,
+            readEnabled: true,
+            isSpeaking: false
+        };
+
+        // Load Settings
+        const savedSettings = JSON.parse(localStorage.getItem('miniGamersSettings') || '{}');
+        if (savedSettings.soundEnabled !== undefined) state.soundEnabled = savedSettings.soundEnabled;
+        if (savedSettings.readAloudEnabled !== undefined) state.readEnabled = savedSettings.readAloudEnabled;
+        updateButtons();
+
+        // ==========================================
+        // ROBUST AUDIO & TTS SYSTEM
+        // ==========================================
+        let isTTSUnlocked = false;
+        let speakQueue = [];
+        let voicesLoaded = false;
+
+        const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+        let audioCtx = new AudioContextClass();
+
+        function initTTS() {
+            if ('speechSynthesis' in window) {
+                if (window.speechSynthesis.getVoices().length > 0) voicesLoaded = true;
+                window.speechSynthesis.onvoiceschanged = () => {
+                    console.log("🔊 Voices loaded");
+                    voicesLoaded = true;
+                };
+            }
+        }
+        initTTS();
+
+        function unlockAudio() {
+            if (audioCtx.state === 'suspended') {
+                audioCtx.resume().then(() => console.log("🔊 Audio Resumed"));
+            }
+            if (!isTTSUnlocked && window.speechSynthesis) {
+                isTTSUnlocked = true;
+                console.log("🔓 Unlocking TTS...");
+
+                // IRS Fix: Prime with silence
+                const empty = new SpeechSynthesisUtterance(" ");
+                empty.volume = 0;
+                window.speechSynthesis.speak(empty);
+
+                if (window.speechSynthesis.paused) window.speechSynthesis.resume();
+
+                setTimeout(processSpeakQueue, 100);
+            }
+        }
+
+        document.body.addEventListener('touchstart', unlockAudio, { once: true });
+        document.body.addEventListener('click', unlockAudio, { once: true });
+
+        function processSpeakQueue() {
+            if (speakQueue.length === 0) return;
+            const text = speakQueue.shift();
+            speakQueue = [];
+            speak(text);
+        }
+
+        function speak(text) {
+            if (!state.readEnabled) return;
+            if (!('speechSynthesis' in window)) return;
+
+            // 1. Queue if locked
+            if (!isTTSUnlocked) {
+                console.log("🔒 TTS locked, queuing:", text);
+                speakQueue.push(text);
+                return;
+            }
+
+            // 2. Cancel previous
+            window.speechSynthesis.cancel();
+            if (window.speechSynthesis.paused) window.speechSynthesis.resume();
+
+            // 3. Process
+            const processedText = (text || "").replace(/\.\.\./g, ' ');
+            const utter = new SpeechSynthesisUtterance(processedText);
+            utter.rate = 0.9;
+            utter.lang = 'en-US';
+
+            // 4. Voice Selection
+            const voices = window.speechSynthesis.getVoices();
+            if (voices.length > 0) {
+                let preferredVoice = voices.find(v =>
+                    (v.name.includes('Samantha') || v.name.includes('Google US English'))
+                    && v.lang.startsWith('en')
+                );
+                if (!preferredVoice) preferredVoice = voices.find(v => v.lang.startsWith('en'));
+                if (preferredVoice) utter.voice = preferredVoice;
+            }
+
+            // 5. Speak (GC Fix)
+            window.currentUtterance = utter;
+            utter.onend = () => { window.currentUtterance = null; };
+
+            window.speechSynthesis.speak(utter);
+            if (window.speechSynthesis.paused) window.speechSynthesis.resume();
+        }
+
+        initGame();
+
+        function initGame() {
+            document.getElementById('winModal').classList.remove('visible');
+            state.score = 0;
+            state.isLocked = false;
+            updateScoreUI();
+            newRound();
+        }
+
+        function newRound() {
+            state.isLocked = false;
+
+            // CRITICAL: Cancel any ongoing speech first
+            if (window.speechSynthesis) {
+                window.speechSynthesis.cancel();
+            }
+            state.isSpeaking = false;
+
+            // Pick target letter
+            state.targetLetter = ALPHABET[Math.floor(Math.random() * ALPHABET.length)];
+
+            // Generate options (12 letters shown)
+            let options = [state.targetLetter];
+            while (options.length < 12) {
+                const randLetter = ALPHABET[Math.floor(Math.random() * ALPHABET.length)];
+                if (!options.includes(randLetter)) {
+                    options.push(randLetter);
+                }
+            }
+            // Shuffle
+            options.sort(() => 0.5 - Math.random());
+            state.currentOptions = options;
+
+            // Render grid
+            renderLetterGrid();
+
+            // Speak instruction after a delay to ensure cancellation is complete
+            setTimeout(() => {
+                speakInstruction();
+            }, 200);
+        }
+
+
+
+        function renderLetterGrid() {
+            const grid = document.getElementById('letterGrid');
+            grid.innerHTML = '';
+
+            state.currentOptions.forEach(letter => {
+                const btn = document.createElement('button');
+                btn.className = 'letter-btn';
+                // Show both capital and lowercase - same size
+                btn.innerHTML = `<div style="display: flex; gap: 8px; align-items: center; justify-content: center;"><span style="font-size: 1.8rem;">${letter}</span><span style="font-size: 1.8rem;">${letter.toLowerCase()}</span></div>`;
+                btn.onclick = () => handleLetterClick(letter);
+                grid.appendChild(btn);
+            });
+        }
+
+        function handleLetterClick(letter) {
+            if (state.isLocked) return;
+
+            const btnEl = [...document.querySelectorAll('.letter-btn')].find(b => b.textContent === letter);
+
+            if (letter === state.targetLetter) {
+                // Correct!
+                state.score++;
+                updateScoreUI();
+                playSound('correct');
+
+                if (btnEl) btnEl.classList.add('correct');
+
+                if (state.readEnabled) {
+                    speak(`Correct!`);
+                }
+
+                state.isLocked = true;
+
+                // Check win
+                if (state.score >= 10) {
+                    setTimeout(showWin, 800);
+                } else {
+                    setTimeout(newRound, 1200);
+                }
+            } else {
+                // Wrong
+                playSound('wrong');
+
+                if (btnEl) {
+                    btnEl.classList.add('wrong');
+                    setTimeout(() => btnEl.classList.remove('wrong'), 400);
+                }
+
+                if (state.readEnabled) {
+                    speak('Try again!');
+                }
+            }
+        }
+
+        function showWin() {
+            playSound('win');
+            document.getElementById('finalScoreText').textContent = `Score: 10 / 10`;
+            document.getElementById('winModal').classList.add('visible');
+            speak("Great job! You know your letters!");
+        }
+
+        function updateScoreUI() {
+            document.getElementById('scoreDisplay').textContent = `Score: ${state.score} / 10`;
+        }
+
+
+        function restartGame() {
+            playSound('click');
+            initGame();
+        }
+
+        // --- Mascot Logic ---
+
+        function repeatInstruction() {
+            speakInstruction();
+            playSound('click');
+        }
+
+        function speakInstruction() {
+            if (!state.readEnabled) return;
+
+            // Prevent double-speak by adding a small debounce
+            if (state.isSpeaking) return;
+            state.isSpeaking = true;
+
+            const text = `Tap the letter ${state.targetLetter}`;
+
+            // Delay slightly to ensure audio is ready
+            setTimeout(() => {
+                speak(text);
+                setTimeout(() => { state.isSpeaking = false; }, 500);
+            }, 100);
+        }
+
+        // --- Audio & TTS ---
+        function toggleSound() {
+            state.soundEnabled = !state.soundEnabled;
+            updateButtons();
+            saveSettings();
+        }
+
+        function toggleRead() {
+            state.readEnabled = !state.readEnabled;
+            updateButtons();
+            saveSettings();
+        }
+
+        function updateButtons() {
+            const btnSound = document.getElementById('btnSound');
+            const btnRead = document.getElementById('btnRead');
+
+            if (state.soundEnabled) {
+                btnSound.textContent = "🔊 SOUND: ON";
+                btnSound.classList.remove('off');
+            } else {
+                btnSound.textContent = "🔊 SOUND: OFF";
+                btnSound.classList.add('off');
+            }
+
+            if (state.readEnabled) {
+                btnRead.textContent = "📢 READ: ON";
+                btnRead.classList.remove('off');
+            } else {
+                btnRead.textContent = "📢 READ: OFF";
+                btnRead.classList.add('off');
+            }
+        }
+
+        function saveSettings() {
+            localStorage.setItem('miniGamersSettings', JSON.stringify({
+                soundEnabled: state.soundEnabled,
+                readAloudEnabled: state.readEnabled
+            }));
+        }
+
+        function playSound(type) {
+            if (!state.soundEnabled) return;
+            if (audioCtx.state === 'suspended') audioCtx.resume();
+
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+
+            osc.connect(gain);
+            gain.connect(audioCtx.destination);
+
+            const now = audioCtx.currentTime;
+
+            if (type === 'correct') {
+                osc.type = 'triangle';
+                osc.frequency.setValueAtTime(800, now);
+                osc.frequency.exponentialRampToValueAtTime(1200, now + 0.2);
+                gain.gain.setValueAtTime(0.1, now);
+                gain.gain.exponentialRampToValueAtTime(0.01, now + 0.3);
+                osc.start(now);
+                osc.stop(now + 0.3);
+            } else if (type === 'wrong') {
+                osc.type = 'sawtooth'; // Sharper sound
+                osc.frequency.setValueAtTime(350, now); // Higher pitch for visibility
+                osc.frequency.linearRampToValueAtTime(150, now + 0.3); // Slide down
+                gain.gain.setValueAtTime(0.1, now);
+                gain.gain.exponentialRampToValueAtTime(0.01, now + 0.3);
+                osc.start(now);
+                osc.stop(now + 0.3);
+            } else if (type === 'click') {
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(600, now);
+                gain.gain.setValueAtTime(0.05, now);
+                gain.gain.exponentialRampToValueAtTime(0.01, now + 0.05);
+                osc.start(now);
+                osc.stop(now + 0.05);
+            } else if (type === 'win') {
+                osc.type = 'triangle';
+                osc.frequency.setValueAtTime(523.25, now);
+                osc.frequency.setValueAtTime(659.25, now + 0.15);
+                osc.frequency.setValueAtTime(783.99, now + 0.3);
+                osc.frequency.setValueAtTime(1046.50, now + 0.45);
+
+                gain.gain.setValueAtTime(0.1, now);
+                gain.gain.linearRampToValueAtTime(0.1, now + 0.6);
+                gain.gain.exponentialRampToValueAtTime(0.01, now + 1.0);
+
+                osc.start(now);
+                osc.stop(now + 1.0);
+            }
+        }
+
+        // speak() moved to Robust Audio System at top
+    </script>
+</body>
+
+</html>
