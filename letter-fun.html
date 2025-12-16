@@ -195,9 +195,16 @@
         }
 
         .controls {
+            margin-top: 10px;
             display: flex;
-            gap: 10px;
-            margin-bottom: 10px;
+            gap: 15px;
+            background: rgba(255, 255, 255, 0.2);
+            padding: 10px 20px;
+            border-radius: 50px;
+            backdrop-filter: blur(5px);
+            justify-content: center;
+            align-items: center;
+            box-shadow: inset 0 2px 5px rgba(255, 255, 255, 0.5), 0 5px 15px rgba(0, 0, 0, 0.05);
         }
 
         .mode-btn {
@@ -563,8 +570,8 @@
             <div id="scoreDisplay" class="score-board">Score: 0 / 10</div>
 
             <div class="controls-row controls">
-                <button id="modeEasy" class="mode-btn active" onclick="setMode('easy')">A-Z</button>
-                <button id="modeHard" class="mode-btn" onclick="setMode('hard')">RANDOM</button>
+                <button id="modeEasy" class="mode-btn active" onclick="setMode('easy')">EASY</button>
+                <button id="modeHard" class="mode-btn" onclick="setMode('hard')">HARD</button>
                 <button id="textToggleBtn" class="mode-btn" onclick="toggleTextMode()"
                     style="background: #FFB7B2; color: white;">TEXT: ON</button>
                 <button class="mode-btn" onclick="unlockAudio(true); repeatInstruction()"
@@ -607,6 +614,7 @@
         };
 
         let state = {
+            mode: 'easy', // 'easy' (vowels), 'hard' (A-Z)
             score: 0,
             targetLetter: '',
             currentOptions: [],
@@ -735,6 +743,17 @@
             }
         }
 
+        function setMode(newMode) {
+            unlockAudio(); // Explicit Unlock
+            state.mode = newMode;
+
+            // Visual update
+            document.getElementById('modeEasy').classList.toggle('active', newMode === 'easy');
+            document.getElementById('modeHard').classList.toggle('active', newMode === 'hard');
+
+            restartGame();
+        }
+
         function newRound() {
             state.isLocked = false;
 
@@ -744,17 +763,39 @@
             }
             state.isSpeaking = false;
 
-            // Pick target letter
-            state.targetLetter = ALPHABET[Math.floor(Math.random() * ALPHABET.length)];
+            // Pick source pool based on mode
+            // Easy = Vowels only, Hard = All Letters
+            const VOWELS = ['A', 'E', 'I', 'O', 'U'];
+            const POOL = state.mode === 'easy' ? VOWELS : ALPHABET;
 
-            // Generate options (12 letters shown)
-            let options = [state.targetLetter];
-            while (options.length < 12) {
-                const randLetter = ALPHABET[Math.floor(Math.random() * ALPHABET.length)];
-                if (!options.includes(randLetter)) {
-                    options.push(randLetter);
+            // Pick target letter
+            state.targetLetter = POOL[Math.floor(Math.random() * POOL.length)];
+
+            // Generate options (always show 12 items for layout consistency, or less if pool is small)
+            // For Easy mode (5 vowels), we might need to duplicate or fill with others? 
+            // User asked: "Easy will display only the vocal letters". 
+            // If we only have 5 vowels, a 12-grid might look empty or need repeats.
+            // Let's allow repeats if pool is small, or just show the pool.
+            // If pool is small (5), just show them.
+
+            let options = [];
+
+            if (state.mode === 'easy') {
+                // Just use the 5 vowels, maybe repeated to fill grid or just 5?
+                // Visual indicates a grid. 5 buttons in a row is fine.
+                // Let's just show the 5 vowels for simplicity and clarity for "Easy".
+                options = [...VOWELS];
+            } else {
+                // Hard: Pick 12 random letters including target
+                options = [state.targetLetter];
+                while (options.length < 12) {
+                    const randLetter = ALPHABET[Math.floor(Math.random() * ALPHABET.length)];
+                    if (!options.includes(randLetter)) {
+                        options.push(randLetter);
+                    }
                 }
             }
+
             // Shuffle
             options.sort(() => 0.5 - Math.random());
             state.currentOptions = options;
@@ -774,6 +815,7 @@
             state.currentOptions.forEach(letter => {
                 const btn = document.createElement('button');
                 btn.className = 'letter-btn';
+                btn.dataset.letter = letter; // Critical for finding the button later
                 // Show both capital and lowercase - same size
                 btn.innerHTML = `<div style="display: flex; gap: 8px; align-items: center; justify-content: center;"><span style="font-size: 1.8rem;">${letter}</span><span style="font-size: 1.8rem;">${letter.toLowerCase()}</span></div>`;
                 btn.onclick = () => handleLetterClick(letter);
@@ -785,7 +827,8 @@
             unlockAudio(); // Explicit Unlock
             if (state.isLocked) return;
 
-            const btnEl = [...document.querySelectorAll('.letter-btn')].find(b => b.textContent === letter);
+            // Fix: Find button by data attribute, not textContent
+            const btnEl = document.querySelector(`.letter-btn[data-letter="${letter}"]`);
 
             if (letter === state.targetLetter) {
                 // Correct!
@@ -793,32 +836,38 @@
                 updateScoreUI();
                 playSound('correct');
 
-                if (btnEl) btnEl.classList.add('correct');
+                if (btnEl) {
+                    btnEl.classList.add('correct');
+                    btnEl.classList.remove('wrong'); // Ensure no wrong class
+                }
 
-                speak(`Correct!`);
+                speak(`Correct! ${letter} is for...`); // Simple praise
                 triggerConfetti(); // Local Confetti
 
                 state.isLocked = true;
 
-                // Check win
+                // Check Win
                 if (state.score >= 10) {
-                    setTimeout(showWin, 800);
+                    setTimeout(() => {
+                        document.getElementById('winModal').classList.add('visible');
+                        playSound('success');
+                    }, 1000);
                 } else {
-                    setTimeout(newRound, 1200);
+                    setTimeout(newRound, 1500);
                 }
+
             } else {
                 // Wrong
                 playSound('wrong');
-
                 if (btnEl) {
                     btnEl.classList.add('wrong');
-                    setTimeout(() => btnEl.classList.remove('wrong'), 400);
+                    // Remove wrong class after animation to allow re-shake
+                    setTimeout(() => btnEl.classList.remove('wrong'), 500);
                 }
-
-                speak('Try again!');
-
+                speak("Try again!");
             }
         }
+
 
         function showWin() {
             playSound('win');
