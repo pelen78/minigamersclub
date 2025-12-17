@@ -155,12 +155,12 @@
 
         /* Prevent scrolling in Color Match mode */
         body.color-mode-active {
-            overflow: hidden;
+            overflow-y: auto;
             width: 100%;
-            height: 100vh;
-            /* Lock height to viewport */
-            touch-action: none;
-            /* Prevent swipe-to-scroll on some mobile */
+            height: auto;
+            min-height: 100vh;
+            /* Allow scrolling */
+            /* touch-action: none; Removed to allow scrolling */
         }
 
         @keyframes rise {
@@ -2276,7 +2276,7 @@
                     <style>
                         .color-game-logo {
                             max-width: 95%;
-                            width: 550px;
+                            width: 600px;
                             height: auto;
                             display: block;
                             margin: 0 auto 10px auto;

@@ -32,13 +32,24 @@
         body {
             font-family: 'Nunito', sans-serif;
             background: var(--bg-gradient);
-            height: 100vh;
+            height: auto;
+            min-height: 100vh;
             color: var(--text-dark);
-            overflow: hidden;
+            overflow-y: auto;
+            /* Allow scrolling */
             display: flex;
             flex-direction: column;
             width: 100%;
-            touch-action: none;
+            /* touch-action: none; */
+        }
+
+        .game-logo {
+            max-width: 95%;
+            width: 600px;
+            height: auto;
+            display: block;
+            margin: 0 auto 10px auto;
+            filter: drop-shadow(0 4px 6px rgba(0, 0, 0, 0.2));
         }
 
         /* Floating bubbles background */
@@ -560,7 +571,8 @@
 
     <!-- Game Area -->
     <div class="game-container">
-        <div class="game-title">Music Maker</div>
+        <!-- <div class="game-title">Music Maker</div> -->
+        <img src="images/musicmatchbanner.png" class="game-logo" alt="Music Maker">
         <div class="controls-row controls">
             <div style="display:flex; gap:10px; align-items:center;">
                 <button id="modeEasy" class="mode-btn active" onclick="setMode('easy')">FREE PLAY</button>

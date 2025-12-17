@@ -31,14 +31,15 @@
         body {
             font-family: 'Nunito', sans-serif;
             background: var(--bg-gradient);
-            height: 100vh;
+            height: auto;
+            min-height: 100vh;
             color: var(--text-dark);
-            overflow: hidden;
-            /* No scrolling for game */
+            overflow-y: auto;
+            /* Allow vertical scrolling */
             display: flex;
             flex-direction: column;
             width: 100%;
-            touch-action: none;
+            /* touch-action: none; Removed to allow scrolling */
         }
 
         /* Floating bubbles background (Visuals) */
@@ -198,6 +199,15 @@
             /* Blueish for variety */
             margin-bottom: 5px;
             text-shadow: 2px 2px 0px rgba(0, 0, 0, 0.05);
+        }
+
+        .game-logo {
+            max-width: 95%;
+            width: 550px;
+            height: auto;
+            display: block;
+            margin: 0 auto 10px auto;
+            filter: drop-shadow(0 4px 6px rgba(0, 0, 0, 0.2));
         }
 
         /* Mascot Styles */
@@ -658,10 +668,8 @@
     <!-- Game Area -->
     <div class="app-container">
         <div class="game-wrapper">
-            <div style="display: flex; align-items: center; justify-content: center; margin: 15px 0; gap: 15px;">
-
-                <h1>Number Fun!</h1>
-            </div>
+            <!-- <div class="game-title">Number Fun</div> -->
+            <img src="images/numberfunbannerv2.png" class="game-logo" alt="Number Fun">
             <div class="game-container">
                 <div class="controls-row controls">
                     <button id="modeEasy" class="mode-btn active" onclick="setMode('easy')">EASY</button>
