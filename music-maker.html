@@ -339,10 +339,11 @@
         .pad-grid {
             display: grid;
             gap: 15px;
-            width: 95%;
-            padding: 10px;
-            /* Default Desktop: 4 columns x 2 rows */
-            grid-template-columns: repeat(4, 1fr);
+            width: 100%;
+            max-width: 800px;
+            padding: 20px;
+            /* Desktop: 8 notes in a single row */
+            grid-template-columns: repeat(8, 1fr);
         }
 
         .music-pad {
@@ -490,12 +491,12 @@
         }
 
         /* Mobile Responsive */
-        @media (max-width: 600px) {
+        @media (max-width: 650px) {
             .pad-grid {
-                /* Mobile: 2 columns x 4 rows */
-                grid-template-columns: repeat(2, 1fr);
-                max-width: 350px;
+                /* Mobile: 4x2 grid for better touch targets */
+                grid-template-columns: repeat(4, 1fr);
                 gap: 12px;
+                padding: 10px;
             }
 
             .music-pad {
@@ -572,7 +573,7 @@
     <!-- Game Area -->
     <div class="game-container">
         <!-- <div class="game-title">Music Maker</div> -->
-        <img src="images/musicmatchbanner.png" class="game-logo" alt="Music Maker">
+        <img src="images/musicmakerbanner_v2.png" class="game-logo" alt="Music Maker">
         <div class="controls-row controls">
             <div style="display:flex; gap:10px; align-items:center;">
                 <button id="modeEasy" class="mode-btn active" onclick="setMode('easy')">FREE PLAY</button>

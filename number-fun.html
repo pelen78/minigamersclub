@@ -681,7 +681,8 @@
                 <div id="scoreDisplay" class="score-text">Score: 0 / 10</div>
 
                 <div class="question-box">
-                    <div id="questionText" class="question-text">?</div>
+                    <div id="questionText" class="question-text" onclick="speakCurrentQuestion()"
+                        style="cursor: pointer;">?</div>
                     <div id="instructionText" class="instruction-text">Tap the correct number!</div>
                 </div>
 
@@ -848,8 +849,8 @@
                     grid.appendChild(btn);
                 });
 
-                // Speak - REMOVED for Tap-to-Hear
-                // setTimeout(() => speak(instructionStr), 200);
+                // Speak automatically
+                setTimeout(() => speakCurrentQuestion(), 200);
             }
 
             function generateNumbers() {
@@ -1037,7 +1038,7 @@
 
             // Robust Speak Function
             function speak(text) {
-                if (!state.readEnabled) return; // Respect local game settings
+                // if (!state.readEnabled) return; // Voice should work even if text is hidden
                 if (!('speechSynthesis' in window)) return;
 
                 // 1. Queue if locked
