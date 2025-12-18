@@ -268,23 +268,20 @@
 
         /* Letter Grid */
         .letter-grid {
-            display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 10px;
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 15px;
             width: 100%;
-            max-width: 500px;
-            margin: 10px auto;
+            max-width: 700px;
+            margin: 20px auto;
         }
 
-        @media (min-width: 600px) {
-            .letter-grid {
-                grid-template-columns: repeat(6, 1fr);
-                max-width: 600px;
-            }
-        }
+
 
         .letter-btn {
-            aspect-ratio: 1;
+            width: 80px;
+            height: 80px;
             background: white;
             border: 3px solid var(--accent);
             border-radius: 15px;
@@ -297,6 +294,7 @@
             display: flex;
             align-items: center;
             justify-content: center;
+            flex-shrink: 0;
         }
 
         .letter-btn:hover {
@@ -575,15 +573,12 @@
             <div class="controls-row controls">
                 <button id="modeEasy" class="mode-btn active" onclick="setMode('easy')">EASY</button>
                 <button id="modeHard" class="mode-btn" onclick="setMode('hard')">HARD</button>
-                <button id="textToggleBtn" class="mode-btn" onclick="toggleTextMode()"
-                    style="background: #FFB7B2; color: white;">TEXT: ON</button>
                 <button class="mode-btn" onclick="unlockAudio(true); repeatInstruction()"
                     style="background: #FFF9C4; color: #FBC02D; font-size: 1.2rem; min-width: 44px;">👂</button>
             </div>
 
             <div class="instruction-area">
                 <div id="instructionText" class="instruction">Tap the Letter...</div>
-                <div id="targetDisplay" class="target-letter">A</div>
             </div>
 
             <div id="letterGrid" class="letter-grid">
@@ -639,6 +634,7 @@
         let isTTSUnlocked = false;
         let speakQueue = [];
         let voicesLoaded = false;
+        let lastSpeechId = 0; // Robust Singleton pattern
 
         const AudioContextClass = window.AudioContext || window.webkitAudioContext;
         let audioCtx = new AudioContextClass();
@@ -674,48 +670,58 @@
 
         function processSpeakQueue() {
             if (speakQueue.length === 0) return;
-            const text = speakQueue.shift();
-            speakQueue = []; // Clear queue after processing one
-            speak(text);
+            const item = speakQueue.shift();
+            speakQueue = [];
+            speak(item.text, item.callback);
         }
 
-        function speak(text) {
+        function speak(text, callback) {
             if (!state.readEnabled || !('speechSynthesis' in window)) return;
 
-            // 1. Queue if locked
-            if (!isTTSUnlocked) {
-                console.log("🔒 TTS locked, queuing:", text);
-                speakQueue.push(text);
-                return;
-            }
-
-            // 2. Cancel previous
+            // 1. Singleton pattern: Cancel previous work
+            const currentId = ++lastSpeechId;
             window.speechSynthesis.cancel();
             if (window.speechSynthesis.paused) window.speechSynthesis.resume();
 
-            // 3. Process
-            const processedText = (text || "").replace(/\.\.\./g, ' ');
-            const utter = new SpeechSynthesisUtterance(processedText);
-            utter.rate = 0.9;
-            utter.lang = 'en-US';
-
-            // 4. Voice Selection
-            const voices = window.speechSynthesis.getVoices();
-            if (voices.length > 0) {
-                let preferredVoice = voices.find(v =>
-                    (v.name.includes('Samantha') || v.name.includes('Google US English'))
-                    && v.lang.startsWith('en')
-                );
-                if (!preferredVoice) preferredVoice = voices.find(v => v.lang.startsWith('en'));
-                if (preferredVoice) utter.voice = preferredVoice;
+            // 2. Queue if locked
+            if (!isTTSUnlocked) {
+                speakQueue = [{ text, callback }];
+                return;
             }
 
-            // 5. Speak (GC Fix)
-            window.currentUtterance = utter;
-            utter.onend = () => { window.currentUtterance = null; };
+            // 3. Process with small delay to allow OS to clear
+            setTimeout(() => {
+                if (currentId !== lastSpeechId) return;
 
-            window.speechSynthesis.speak(utter);
-            if (window.speechSynthesis.paused) window.speechSynthesis.resume();
+                const processedText = (text || "").replace(/\.\.\./g, ' ');
+                const utter = new SpeechSynthesisUtterance(processedText);
+                utter.rate = 0.9;
+                utter.lang = 'en-US';
+
+                // Voice Selection
+                const voices = window.speechSynthesis.getVoices();
+                if (voices.length > 0) {
+                    let preferredVoice = voices.find(v =>
+                        (v.name.includes('Samantha') || v.name.includes('Google US English'))
+                        && v.lang.startsWith('en')
+                    );
+                    if (!preferredVoice) preferredVoice = voices.find(v => v.lang.startsWith('en'));
+                    if (preferredVoice) utter.voice = preferredVoice;
+                }
+
+                // Handle Callback
+                utter.onend = () => {
+                    window.currentUtterance = null;
+                    if (callback) callback();
+                };
+                utter.onerror = () => {
+                    window.currentUtterance = null;
+                    if (callback) callback();
+                };
+
+                window.currentUtterance = utter;
+                window.speechSynthesis.speak(utter);
+            }, 100);
         }
 
         initGame();
@@ -807,6 +813,7 @@
             renderLetterGrid();
 
             // speakInstruction(); // REMOVED: Tap-to-Hear Only
+            setTimeout(() => speakInstruction(), 500); // Auto-speak next letter
         }
 
 
@@ -844,20 +851,20 @@
                     btnEl.classList.remove('wrong'); // Ensure no wrong class
                 }
 
-                speak(`Correct! ${letter} is for...`); // Simple praise
+                speak("Correct!", () => {
+                    // Check Win
+                    if (state.score >= 10) {
+                        setTimeout(() => {
+                            document.getElementById('winModal').classList.add('visible');
+                            playSound('success');
+                        }, 500);
+                    } else {
+                        setTimeout(newRound, 800);
+                    }
+                });
                 triggerConfetti(); // Local Confetti
 
                 state.isLocked = true;
-
-                // Check Win
-                if (state.score >= 10) {
-                    setTimeout(() => {
-                        document.getElementById('winModal').classList.add('visible');
-                        playSound('success');
-                    }, 1000);
-                } else {
-                    setTimeout(newRound, 1500);
-                }
 
             } else {
                 // Wrong
@@ -898,17 +905,8 @@
         }
 
         function speakInstruction() {
-            // Prevent double-speak by adding a small debounce
-            if (state.isSpeaking) return;
-            state.isSpeaking = true;
-
             const text = `Tap the letter ${state.targetLetter}`;
-
-            // Delay slightly to ensure audio is ready
-            setTimeout(() => {
-                speak(text);
-                setTimeout(() => { state.isSpeaking = false; }, 500);
-            }, 100);
+            speak(text);
         }
 
         // --- Audio & TTS ---
@@ -919,12 +917,7 @@
             saveSettings();
         }
 
-        function toggleTextMode() {
-            unlockAudio();
-            state.readEnabled = !state.readEnabled;
-            updateButtons();
-            saveSettings();
-        }
+
 
 
         function updateButtons() {
@@ -936,12 +929,6 @@
             } else {
                 btnSound.textContent = "🔊 SOUND: OFF";
                 btnSound.classList.add('off');
-            }
-
-            const btnText = document.getElementById('textToggleBtn');
-            if (btnText) {
-                btnText.textContent = state.readEnabled ? "TEXT: ON" : "TEXT: OFF";
-                btnText.style.background = state.readEnabled ? "#FFB7B2" : "#ccc";
             }
         }
 
