@@ -123,25 +123,37 @@
             align-items: center;
         }
 
-        /* Tool Buttons */
+        /* Color Bar at Top */
+        .color-bar {
+            background: rgba(255, 255, 255, 0.9);
+            padding: 10px;
+            display: flex;
+            justify-content: center;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+            z-index: 90;
+        }
+
         .tool-btn {
             width: 50px;
             height: 50px;
             border-radius: 50%;
             border: 3px solid transparent;
-            background: #f0f0f0;
+            background: #f8f9fa;
+            /* Standardized Light Gray */
             display: flex;
             align-items: center;
             justify-content: center;
             font-size: 1.5rem;
             cursor: pointer;
             transition: transform 0.2s, background 0.2s;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
         }
 
         .tool-btn.active {
             background: #FFDAC1;
             border-color: #FF9AA2;
-            transform: translateY(-5px);
+            transform: translateY(-3px);
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
         }
 
         .tool-btn:active {
@@ -152,24 +164,27 @@
         .color-row {
             display: flex;
             justify-content: center;
-            gap: 10px;
+            gap: 8px;
+            /* Slightly tighter gap */
             overflow-x: auto;
             padding: 5px;
+            max-width: 100%;
         }
 
         .color-btn {
-            width: 35px;
-            height: 35px;
+            width: 32px;
+            /* Smaller size for mobile */
+            height: 32px;
             border-radius: 50%;
-            border: 2px solid white;
-            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+            border: 3px solid white;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
             cursor: pointer;
             flex-shrink: 0;
-            transition: transform 0.2s;
+            transition: transform 0.2s, border-color 0.2s;
         }
 
         .color-btn.active {
-            transform: scale(1.2);
+            transform: scale(1.1);
             border-color: #555;
         }
 
@@ -187,11 +202,28 @@
 
     <div class="top-bar">
         <button class="btn-home" onclick="goHome()">🏠 HOME</button>
-        <button id="btnSound" class="btn-toggle" onclick="toggleSound()">🔊 SOUND: ON</button>
         <button class="btn-toggle" onclick="undo()"
             style="background: #FFE082 !important; color: #795548 !important;">↩️ UNDO</button>
         <button class="btn-toggle" onclick="clearCanvas()"
             style="background:#FF9AA2 !important; color: white !important;">🗑️ CLEAR</button>
+    </div>
+
+    <div class="color-bar">
+        <div class="color-row">
+            <div class="color-btn active" style="background: black" onclick="setColor('black', this)"></div>
+            <div class="color-btn" style="background: #FF5555" onclick="setColor('#FF5555', this)"></div>
+            <div class="color-btn" style="background: #FFAA55" onclick="setColor('#FFAA55', this)"></div>
+            <div class="color-btn" style="background: #FFFFAA" onclick="setColor('#FFFFAA', this)"></div>
+            <div class="color-btn" style="background: #55FF55" onclick="setColor('#55FF55', this)"></div>
+            <div class="color-btn" style="background: #55AAFF" onclick="setColor('#55AAFF', this)"></div>
+            <div class="color-btn" style="background: #AA55FF" onclick="setColor('#AA55FF', this)"></div>
+            <div class="color-btn" style="background: #FFAAFF" onclick="setColor('#FFAAFF', this)"></div>
+
+            <!-- Custom Picker -->
+            <label for="colorPickerInput" class="color-btn color-picker-label" title="Pick Color"
+                style="background: linear-gradient(to right, red, orange, yellow, green, blue, indigo, violet);"></label>
+            <input type="color" id="colorPickerInput" onchange="setColor(this.value, null)">
+        </div>
     </div>
 
     <div class="canvas-container" id="canvasContainer">
@@ -212,6 +244,8 @@
             <button class="tool-btn" onclick="setTool('eraser')" title="Eraser">🧼</button>
             <!-- Fill -->
             <button class="tool-btn" onclick="setTool('fill')" title="Fill">🪣</button>
+            <!-- Move -->
+            <button class="tool-btn" onclick="setTool('move')" title="Move">🖐️</button>
         </div>
 
         <div class="tools-row" style="margin-top: 5px;">
@@ -221,25 +255,9 @@
             <button class="tool-btn" onclick="setTool('star')" title="Star">⭐</button>
             <button class="tool-btn" onclick="setTool('line')" title="Line">📏</button>
         </div>
-
-        <div class="color-row">
-            <div class="color-btn active" style="background: black" onclick="setColor('black', this)"></div>
-            <div class="color-btn" style="background: #FF5555" onclick="setColor('#FF5555', this)"></div>
-            <div class="color-btn" style="background: #FFAA55" onclick="setColor('#FFAA55', this)"></div>
-            <div class="color-btn" style="background: #FFFFAA" onclick="setColor('#FFFFAA', this)"></div>
-            <div class="color-btn" style="background: #55FF55" onclick="setColor('#55FF55', this)"></div>
-            <div class="color-btn" style="background: #55AAFF" onclick="setColor('#55AAFF', this)"></div>
-            <div class="color-btn" style="background: #AA55FF" onclick="setColor('#AA55FF', this)"></div>
-            <div class="color-btn" style="background: #FFAAFF" onclick="setColor('#FFAAFF', this)"></div>
-
-            <!-- Custom Picker -->
-            <label for="colorPickerInput" class="color-btn color-picker-label" title="Pick Color"></label>
-            <input type="color" id="colorPickerInput" onchange="setColor(this.value, null)">
-        </div>
     </div>
 
     <script>
-        // --- STATE ---
         const canvas = document.getElementById('drawCanvas');
         const ctx = canvas.getContext('2d');
         const previewCanvas = document.getElementById('previewCanvas');
@@ -249,15 +267,25 @@
         let historyStack = [];
         const MAX_HISTORY = 20;
 
+        let drawnObjects = []; // For movable shapes
+        let selectedObject = null;
+        let dragOffsetX = 0;
+        let dragOffsetY = 0;
+
+        // Offscreen canvas for scribbles (ink/fill)
+        const scribbleCanvas = document.createElement('canvas');
+        const sctx = scribbleCanvas.getContext('2d');
+
         let isDrawing = false;
         let isDrawingShape = false;
+        let isMoving = false;
         let startX = 0;
         let startY = 0;
         let lastX = 0;
         let lastY = 0;
         let hue = 0; // For rainbow
 
-        let tool = 'pen'; // pen, marker, rainbow, eraser, fill, rect, circle, triangle, star, line
+        let tool = 'pen'; // pen, marker, rainbow, eraser, fill, rect, circle, triangle, star, line, move
         let currentColor = 'black';
         let currentLineWidth = 5;
 
@@ -321,28 +349,69 @@
             canvas.height = container.offsetHeight;
             previewCanvas.width = canvas.width;
             previewCanvas.height = canvas.height;
-            // Restore context settings after resize
-            ctx.lineCap = 'round';
-            ctx.lineJoin = 'round';
+            scribbleCanvas.width = canvas.width;
+            scribbleCanvas.height = canvas.height;
+
+            // Restore context settings
             resetContext();
+            render();
         }
 
         function resetContext() {
-            ctx.lineCap = 'round';
-            ctx.lineJoin = 'round';
+            [ctx, sctx, pctx].forEach(c => {
+                c.lineCap = 'round';
+                c.lineJoin = 'round';
+            });
             updateToolSettings();
         }
 
+        function render() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            // Draw pixel layer
+            ctx.drawImage(scribbleCanvas, 0, 0);
+            // Draw objects
+            drawnObjects.forEach(obj => {
+                ctx.save();
+                ctx.lineWidth = obj.lineWidth;
+                ctx.strokeStyle = obj.color;
+                if (obj.fillColor) {
+                    ctx.fillStyle = obj.fillColor;
+                }
+                drawShapePath(ctx, obj.x1, obj.y1, obj.x2, obj.y2, obj.type);
+                if (obj.fillColor) ctx.fill();
+                ctx.stroke();
+                ctx.restore();
+            });
+        }
+
         function startDraw(e) {
-            unlockAudio(); // Explicit Unlock
+            unlockAudio();
             [startX, startY] = getXY(e);
             lastX = startX;
             lastY = startY;
 
-            saveHistory();
+            if (tool === 'move') {
+                selectedObject = findObjectAt(startX, startY);
+                if (selectedObject) {
+                    saveHistory();
+                    isMoving = true;
+                    dragOffsetX = startX - selectedObject.x1;
+                    dragOffsetY = startY - selectedObject.y1;
+                }
+                return;
+            }
 
             if (tool === 'fill') {
-                floodFill(Math.round(lastX), Math.round(lastY), currentColor);
+                const obj = findObjectAt(startX, startY);
+                if (obj) {
+                    saveHistory();
+                    obj.fillColor = currentColor;
+                    render();
+                } else {
+                    saveHistory();
+                    floodFill(Math.round(lastX), Math.round(lastY), sctx, currentColor);
+                    render();
+                }
                 return;
             }
 
@@ -352,53 +421,107 @@
                 return;
             }
 
+            saveHistory();
             isDrawing = true;
-            // Allow dots
             draw(e);
         }
 
         function draw(e) {
             const [x, y] = getXY(e);
 
+            if (isMoving && selectedObject) {
+                const dx = x - startX;
+                const dy = y - startY;
+                const width = selectedObject.x2 - selectedObject.x1;
+                const height = selectedObject.y2 - selectedObject.y1;
+                selectedObject.x1 = x - dragOffsetX;
+                selectedObject.y1 = y - dragOffsetY;
+                selectedObject.x2 = selectedObject.x1 + width;
+                selectedObject.y2 = selectedObject.y1 + height;
+                render();
+                return;
+            }
+
             if (isDrawingShape) {
                 pctx.clearRect(0, 0, previewCanvas.width, previewCanvas.height);
                 setupContext(pctx);
-                drawShape(pctx, startX, startY, x, y, tool);
+                drawShapePath(pctx, startX, startY, x, y, tool);
+                pctx.stroke();
                 return;
             }
 
             if (!isDrawing) return;
 
-            ctx.beginPath();
-            ctx.moveTo(lastX, lastY);
-            ctx.lineTo(x, y);
+            sctx.beginPath();
+            sctx.moveTo(lastX, lastY);
+            sctx.lineTo(x, y);
 
-            // Apply Rainbow
             if (tool === 'rainbow') {
-                ctx.strokeStyle = `hsl(${hue}, 100%, 50%)`;
-                hue++;
-                if (hue >= 360) hue = 0;
+                sctx.strokeStyle = `hsl(${hue}, 100%, 50%)`;
+                hue = (hue + 1) % 360;
             } else if (tool === 'eraser') {
-                ctx.strokeStyle = 'white';
+                sctx.strokeStyle = 'white';
             } else {
-                ctx.strokeStyle = currentColor;
+                sctx.strokeStyle = currentColor;
             }
 
-            ctx.lineWidth = currentLineWidth;
-            ctx.stroke();
+            sctx.lineWidth = currentLineWidth;
+            sctx.globalAlpha = (tool === 'marker') ? 0.5 : 1.0;
+            sctx.stroke();
 
-            [lastX, lastY] = [x, y];
+            lastX = x;
+            lastY = y;
+            render();
         }
 
         function stopDraw(e) {
             if (isDrawingShape) {
                 const [x, y] = getXY(e);
                 pctx.clearRect(0, 0, previewCanvas.width, previewCanvas.height);
-                setupContext(ctx);
-                drawShape(ctx, startX, startY, x, y, tool);
+                saveHistory();
+                drawnObjects.push({
+                    type: tool,
+                    x1: startX, y1: startY,
+                    x2: x, y2: y,
+                    color: tool === 'rainbow' ? `hsl(${hue}, 100%, 50%)` : (tool === 'eraser' ? 'white' : currentColor),
+                    lineWidth: currentLineWidth,
+                    fillColor: null
+                });
+                if (tool === 'rainbow') hue = (hue + 10) % 360;
                 isDrawingShape = false;
+                render();
             }
             isDrawing = false;
+            isMoving = false;
+            selectedObject = null;
+        }
+
+        function findObjectAt(x, y) {
+            // Find top-most (last in array)
+            for (let i = drawnObjects.length - 1; i >= 0; i--) {
+                const obj = drawnObjects[i];
+                if (isPointInShape(x, y, obj)) return obj;
+            }
+            return null;
+        }
+
+        function isPointInShape(x, y, obj) {
+            const minX = Math.min(obj.x1, obj.x2);
+            const maxX = Math.max(obj.x1, obj.x2);
+            const minY = Math.min(obj.y1, obj.y2);
+            const maxY = Math.max(obj.y1, obj.y2);
+            const padding = 10; // Make it easier to grab lines
+
+            if (obj.type === 'rect' || obj.type === 'line') {
+                return x >= minX - padding && x <= maxX + padding && y >= minY - padding && y <= maxY + padding;
+            } else if (obj.type === 'circle') {
+                const radius = Math.sqrt((obj.x2 - obj.x1) ** 2 + (obj.y2 - obj.y1) ** 2);
+                const dist = Math.sqrt((x - obj.x1) ** 2 + (y - obj.y1) ** 2);
+                return dist <= radius + padding;
+            } else {
+                // Polygon-ish (Star, Triangle) - Use bounding box for simplicity for kids
+                return x >= minX - padding && x <= maxX + padding && y >= minY - padding && y <= maxY + padding;
+            }
         }
 
         function setupContext(targetCtx) {
@@ -409,7 +532,6 @@
 
             if (tool === 'rainbow') {
                 targetCtx.strokeStyle = `hsl(${hue}, 100%, 50%)`;
-                hue = (hue + 1) % 360;
             } else if (tool === 'eraser') {
                 targetCtx.strokeStyle = 'white';
             } else {
@@ -419,7 +541,7 @@
             targetCtx.globalAlpha = (tool === 'marker') ? 0.5 : 1.0;
         }
 
-        function drawShape(tCtx, x1, y1, x2, y2, type) {
+        function drawShapePath(tCtx, x1, y1, x2, y2, type) {
             tCtx.beginPath();
             if (type === 'rect') {
                 tCtx.rect(x1, y1, x2 - x1, y2 - y1);
@@ -454,7 +576,6 @@
                 tCtx.lineTo(x1, y1 - radius);
                 tCtx.closePath();
             }
-            tCtx.stroke();
         }
 
         function getXY(e) {
@@ -492,11 +613,13 @@
                 currentLineWidth = 30;
                 ctx.globalAlpha = 1;
             } else if (tool === 'fill') {
-                ctx.globalAlpha = 1;
+                sctx.globalAlpha = 1;
+            } else if (tool === 'move') {
+                sctx.globalAlpha = 1;
             }
 
             // Fix alpha for non-markers
-            if (tool !== 'marker') ctx.globalAlpha = 1;
+            if (tool !== 'marker') sctx.globalAlpha = 1;
         }
 
         function setColor(c, el) {
@@ -515,8 +638,8 @@
         }
 
         // --- FLOOD FILL ---
-        function floodFill(startX, startY, fillStyle) {
-            const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+        function floodFill(startX, startY, targetCtx, fillStyle) {
+            const imageData = targetCtx.getImageData(0, 0, canvas.width, canvas.height);
             const data = imageData.data;
             const targetColor = getPixelColor(data, startX, startY);
             const fillColor = parseColor(fillStyle);
@@ -541,7 +664,7 @@
                     if (y < height - 1) pixelsToCheck.push(x, y + 1);
                 }
             }
-            ctx.putImageData(imageData, 0, 0);
+            targetCtx.putImageData(imageData, 0, 0);
             playSound('click');
         }
 
@@ -578,25 +701,32 @@
             if (historyStack.length >= MAX_HISTORY) {
                 historyStack.shift();
             }
-            historyStack.push(canvas.toDataURL());
+            historyStack.push({
+                scribble: scribbleCanvas.toDataURL(),
+                objects: JSON.parse(JSON.stringify(drawnObjects))
+            });
         }
 
         function undo() {
             if (historyStack.length === 0) return;
-            const previousState = historyStack.pop();
+            const state = historyStack.pop();
             const img = new Image();
             img.onload = () => {
-                ctx.clearRect(0, 0, canvas.width, canvas.height);
-                ctx.drawImage(img, 0, 0);
+                sctx.clearRect(0, 0, scribbleCanvas.width, scribbleCanvas.height);
+                sctx.drawImage(img, 0, 0);
+                drawnObjects = state.objects;
+                render();
             };
-            img.src = previousState;
+            img.src = state.scribble;
             playSound('click');
         }
 
         function clearCanvas() {
             unlockAudio();
-            saveHistory(); // Save state before clearing
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            saveHistory();
+            sctx.clearRect(0, 0, scribbleCanvas.width, scribbleCanvas.height);
+            drawnObjects = [];
+            render();
             playSound('clear');
         }
 
