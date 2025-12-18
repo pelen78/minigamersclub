@@ -574,14 +574,14 @@
         <div class="game-wrapper">
             <div style="display: flex; align-items: center; justify-content: center; margin-bottom: 10px;">
 
-                <h1 style="margin: 0;">Memory Match</h1>
+                <img src="images/memory-match-banner.png" class="game-logo" alt="Memory Match"
+                    style="max-width: 95%; width: 550px; height: auto; display: block; filter: drop-shadow(0 4px 6px rgba(0, 0, 0, 0.2));">
             </div>
 
             <div class="controls-row controls">
                 <button id="modeEasy" class="mode-btn active" onclick="setMode('easy')">EASY</button>
                 <button id="modeHard" class="mode-btn" onclick="setMode('hard')">HARD</button>
-                <button id="textToggleBtn" class="mode-btn" onclick="toggleTextMode()"
-                    style="background: #FFB7B2; color: white;">TEXT: ON</button>
+
                 <button class="mode-btn" onclick="unlockAudio(true); speak('Find the matching pairs!')"
                     style="background: #FFF9C4; color: #FBC02D; font-size: 1.2rem; min-width: 44px;">👂</button>
             </div>
@@ -637,7 +637,7 @@
         if (savedSettings.soundEnabled !== undefined) state.soundEnabled = savedSettings.soundEnabled;
         if (savedSettings.readAloudEnabled !== undefined) state.readEnabled = savedSettings.readAloudEnabled; // Load read aloud setting
         updateButtons();
-        updateSettingsUI(); // Call new function to update text toggle button
+
 
         // ==========================================
         // ROBUST AUDIO & TTS SYSTEM
@@ -763,9 +763,7 @@
             cardEl.classList.add('flipped');
             state.flipped.push({ index, ...state.cards[index] });
 
-            if (state.readEnabled) {
-                speak(state.cards[index].name);
-            }
+            speak(state.cards[index].name);
 
             if (state.flipped.length === 2) {
                 setTimeout(checkMatch, 600); // Wait for transition
@@ -853,9 +851,7 @@
             document.getElementById('finalScoreText').textContent = `Score: ${state.matchedPairs} / ${state.targetPairs}`;
             document.getElementById('winModal').classList.add('visible');
 
-            if (state.readEnabled) { // Conditionally speak
-                speak("Great job! You found all the pairs!");
-            }
+            speak("Great job! You found all the pairs!");
         }
 
         // --- Mascot Logic ---
@@ -892,13 +888,7 @@
             saveSettings();
         }
 
-        function toggleTextMode() {
-            unlockAudio(); // Explicit Unlock
-            state.readEnabled = !state.readEnabled;
-            saveSettings(); // Persist
-            playSound('click');
-            updateSettingsUI();
-        }
+
 
         function updateButtons() {
             const btnSound = document.getElementById('btnSound');
@@ -912,13 +902,7 @@
             }
         }
 
-        function updateSettingsUI() {
-            const btnText = document.getElementById('textToggleBtn');
-            if (btnText) {
-                btnText.textContent = state.readEnabled ? "TEXT: ON" : "TEXT: OFF";
-                btnText.style.background = state.readEnabled ? "#FFB7B2" : "#ccc";
-            }
-        }
+
 
         function saveSettings() {
             localStorage.setItem('miniGamersSettings', JSON.stringify({
