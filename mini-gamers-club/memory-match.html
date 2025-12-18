@@ -1,0 +1,996 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Memory Match - Mini Gamers Club</title>
+    <!-- Google Font: Nunito -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #FF9AA2;
+            --secondary: #FFB7B2;
+            --accent: #FFDAC1;
+            --success: #B5EAD7;
+            --info: #C7CEEA;
+            --bg-gradient: linear-gradient(135deg, #FFDEE9 0%, #B5FFFC 100%);
+            --card-bg: rgba(255, 255, 255, 0.95);
+            --text-dark: #555;
+            --text-light: #888;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            user-select: none;
+            -webkit-user-select: none;
+        }
+
+        body {
+            font-family: 'Nunito', sans-serif;
+            background: var(--bg-gradient);
+            min-height: 100vh;
+            color: var(--text-dark);
+            overflow-x: hidden;
+            /* Allow scrolling generally, specific locks via classes if needed */
+        }
+
+        /* Floating bubbles background */
+        .bubbles {
+            position: fixed;
+            width: 100%;
+            height: 100%;
+            z-index: 0;
+            overflow: hidden;
+            top: 0;
+            left: 0;
+            pointer-events: none;
+        }
+
+        .bubble {
+            position: absolute;
+            bottom: -100px;
+            width: 40px;
+            height: 40px;
+            background: rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            opacity: 0.5;
+            animation: rise 15s infinite ease-in;
+        }
+
+        @keyframes rise {
+            0% {
+                bottom: -100px;
+                transform: translateX(0);
+            }
+
+            50% {
+                transform: translateX(100px);
+            }
+
+            100% {
+                bottom: 110vh;
+                transform: translateX(-200px);
+            }
+        }
+
+        /* Generate some random bubbles */
+        .bubble:nth-child(1) {
+            left: 10%;
+            width: 60px;
+            height: 60px;
+            animation-duration: 9s;
+        }
+
+        .bubble:nth-child(2) {
+            left: 30%;
+            width: 30px;
+            height: 30px;
+            animation-duration: 6s;
+            animation-delay: 2s;
+        }
+
+        .bubble:nth-child(3) {
+            left: 70%;
+            width: 80px;
+            height: 80px;
+            animation-duration: 12s;
+            animation-delay: 1s;
+        }
+
+        .bubble:nth-child(4) {
+            left: 50%;
+            width: 40px;
+            height: 40px;
+            animation-duration: 8s;
+            animation-delay: 4s;
+        }
+
+        .app-container {
+            position: relative;
+            z-index: 1;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        /* Top Bar */
+        .top-bar {
+            background: rgba(255, 255, 255, 0.9);
+            width: 100%;
+            padding: 10px 20px;
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            flex-wrap: wrap;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+        }
+
+        .btn {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 20px;
+            font-family: inherit;
+            font-weight: 700;
+            font-size: 0.9rem;
+            cursor: pointer;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            transition: transform 0.1s;
+        }
+
+        .btn:active {
+            transform: scale(0.95);
+        }
+
+        .btn-home {
+            background: var(--primary);
+            color: white;
+        }
+
+        .btn-toggle {
+            background: var(--info);
+            color: white;
+        }
+
+        .btn-toggle.off {
+            background: #ddd;
+            color: #777;
+        }
+
+        .btn-restart {
+            background: #ff6b81;
+            color: white;
+        }
+
+        /* Game Area */
+        .game-wrapper {
+            flex: 1;
+            width: 100%;
+            max-width: 600px;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        h1 {
+            color: var(--primary);
+            font-size: 2rem;
+            margin-bottom: 5px;
+            text-shadow: 2px 2px 0px white;
+        }
+
+        .score-board {
+            font-size: 1.4rem;
+            font-weight: 800;
+            color: var(--text-dark);
+            margin: 10px 0 20px 0;
+            background: white;
+            padding: 8px 25px;
+            border-radius: 50px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .controls {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .controls {
+            margin-top: 10px;
+            display: flex;
+            gap: 15px;
+            background: rgba(255, 255, 255, 0.2);
+            padding: 10px 20px;
+            border-radius: 50px;
+            /* Use 50px for pill shape */
+            backdrop-filter: blur(5px);
+            justify-content: center;
+            align-items: center;
+            box-shadow: inset 0 2px 5px rgba(255, 255, 255, 0.5), 0 5px 15px rgba(0, 0, 0, 0.05);
+            /* Soft depth */
+        }
+
+        .controls-row {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .mode-btn {
+            background: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-weight: 800;
+            color: #888;
+            cursor: pointer;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+            transition: all 0.2s;
+        }
+
+        .mode-btn.active {
+            background: #FF9AA2;
+            color: white;
+            box-shadow: 0 4px 10px rgba(255, 154, 162, 0.3);
+            transform: scale(1.05);
+        }
+
+        /* Memory Grid */
+        .grid-container {
+            display: grid;
+            gap: 12px;
+            width: 100%;
+            perspective: 1000px;
+            /* For 3D flip */
+        }
+
+        /* Grid Sizes */
+        /* Easy: 4x4 */
+        .grid-easy {
+            grid-template-columns: repeat(4, 1fr);
+            max-width: 400px;
+        }
+
+        /* Hard: 4x5 or 5x4 depending on screen ratio, 
+           User asked for 4x5 but let's stick to max width logic */
+        .grid-hard {
+            grid-template-columns: repeat(4, 1fr);
+            max-width: 400px;
+        }
+
+        /* Card Styles */
+        .mem-card {
+            aspect-ratio: 1;
+            position: relative;
+            cursor: pointer;
+            border-radius: 12px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        /* Inner container for flip */
+        .mem-card-inner {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            text-align: center;
+            transition: transform 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            transform-style: preserve-3d;
+        }
+
+        .mem-card.flipped .mem-card-inner {
+            transform: rotateY(180deg);
+        }
+
+        .mem-card.matched .mem-card-inner {
+            transform: rotateY(180deg);
+        }
+
+        /* Front and Back */
+        .mem-face {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            backface-visibility: hidden;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            border-radius: 12px;
+            font-size: 2.5rem;
+            user-select: none;
+            -webkit-backface-visibility: hidden;
+            /* Safari fix */
+        }
+
+        /* Front (Face Down state visually, confusingly named 'front' in HTML usually refers to face up)
+           Let's adhere to: 
+           Front = The "Project Pattern" / Back of card
+           Back = The "Content" / Face of card (rotated 180 initially)
+        */
+
+        .mem-front {
+            background: linear-gradient(135deg, #FF9AA2 0%, #FFB7B2 100%);
+            border: 2px solid white;
+            color: white;
+            font-size: 1.5rem;
+        }
+
+        .mem-back {
+            background: white;
+            border: 2px solid var(--primary);
+            transform: rotateY(180deg);
+            /* Already rotated */
+        }
+
+        .mem-card.matched {
+            animation: popMatch 0.5s ease-out;
+            cursor: default;
+        }
+
+        @keyframes popMatch {
+            50% {
+                transform: scale(1.1);
+            }
+        }
+
+        /* Win Modal */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 100;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s;
+        }
+
+        .modal-overlay.visible {
+            opacity: 1;
+            pointer-events: all;
+        }
+
+        .modal {
+            background: white;
+            padding: 30px;
+            border-radius: 20px;
+            text-align: center;
+            width: 90%;
+            max-width: 350px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+            transform: scale(0.8);
+            transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        .modal-overlay.visible .modal {
+            transform: scale(1);
+        }
+
+        .modal h2 {
+            font-size: 2rem;
+            margin-bottom: 10px;
+        }
+
+        .modal p {
+            font-size: 1.2rem;
+            color: #666;
+            margin-bottom: 25px;
+        }
+
+        .modal-btn {
+            display: block;
+            width: 100%;
+            padding: 12px;
+            margin: 10px 0;
+            border-radius: 12px;
+            font-size: 1.1rem;
+            border: none;
+            cursor: pointer;
+            font-weight: 700;
+        }
+
+        .btn-play-again {
+            background: var(--success);
+            color: #333;
+        }
+
+        .btn-menu {
+            background: #eee;
+            color: #555;
+        }
+
+        /* Mascot Animations */
+        .star-buddy {
+            width: 48px;
+            height: 48px;
+            margin-right: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            animation: floaty 2.8s ease-in-out infinite;
+            position: relative;
+        }
+
+        .mascot {
+            font-size: 38px;
+            line-height: 1;
+            filter: drop-shadow(0 4px 6px rgba(0, 0, 0, 0.1));
+            cursor: default;
+        }
+
+        .mascot-bubble {
+            position: absolute;
+            bottom: 100%;
+            left: 50%;
+            transform: translateX(-50%);
+            background: white;
+            padding: 4px 8px;
+            border-radius: 10px;
+            font-size: 0.9rem;
+            margin-bottom: 5px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            min-width: 20px;
+            text-align: center;
+            font-weight: 800;
+            color: #555;
+            white-space: nowrap;
+            z-index: 10;
+        }
+
+        .mascot-bubble::after {
+            content: '';
+            position: absolute;
+            bottom: -5px;
+            left: 50%;
+            transform: translateX(-50%);
+            border-width: 5px 5px 0;
+            border-style: solid;
+            border-color: white transparent transparent transparent;
+        }
+
+        @keyframes floaty {
+
+            0%,
+            100% {
+                transform: translateY(0);
+            }
+
+            50% {
+                transform: translateY(-5px);
+            }
+        }
+
+        .mascot-bounce {
+            animation: mascotBounce 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        @keyframes mascotBounce {
+            0% {
+                transform: translateY(0) scale(1);
+            }
+
+            30% {
+                transform: translateY(-10px) scale(1.1);
+            }
+
+            100% {
+                transform: translateY(0) scale(1);
+            }
+        }
+
+        .mascot-wiggle {
+            animation: mascotWiggle 0.5s ease-in-out;
+        }
+
+        @keyframes mascotWiggle {
+
+            0%,
+            100% {
+                transform: rotate(0);
+            }
+
+            25% {
+                transform: rotate(-10deg);
+            }
+
+            75% {
+                transform: rotate(10deg);
+            }
+        }
+
+        /* Mobile Responsive Adjustments */
+        @media (max-height: 700px) {
+            .app-container {
+                min-height: 100svh;
+            }
+
+            h1 {
+                font-size: 1.5rem;
+            }
+
+            .score-board {
+                font-size: 1.1rem;
+                padding: 5px 20px;
+                margin: 5px 0 15px 0;
+            }
+
+            .grid-container {
+                gap: 8px;
+            }
+
+            .mem-face {
+                font-size: 2rem;
+            }
+        }
+
+        /* Confetti */
+        .confetti {
+            position: fixed;
+            width: 10px;
+            height: 10px;
+            background-color: #f00;
+            animation: fall linear forwards;
+            pointer-events: none;
+            z-index: 9999;
+        }
+
+        @keyframes fall {
+            to {
+                transform: translateY(100vh) rotate(720deg);
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Background Bubbles -->
+    <div class="bubbles">
+        <div class="bubble"></div>
+        <div class="bubble"></div>
+        <div class="bubble"></div>
+        <div class="bubble"></div>
+    </div>
+
+    <div class="app-container">
+        <!-- Top Navigation -->
+        <div class="top-bar">
+            <button class="btn btn-home" onclick="window.location.href='index.html'">🏠 HOME</button>
+            <button id="btnSound" class="btn btn-toggle" onclick="toggleSound()">🔊 SOUND: ON</button>
+        </div>
+
+        <div class="game-wrapper">
+            <div style="display: flex; align-items: center; justify-content: center; margin-bottom: 10px;">
+
+                <img src="images/memory-match-banner.png" class="game-logo" alt="Memory Match"
+                    style="max-width: 95%; width: 550px; height: auto; display: block; filter: drop-shadow(0 4px 6px rgba(0, 0, 0, 0.2));">
+            </div>
+
+            <div class="controls-row controls">
+                <button id="modeEasy" class="mode-btn active" onclick="setMode('easy')">EASY</button>
+                <button id="modeHard" class="mode-btn" onclick="setMode('hard')">HARD</button>
+
+                <button class="mode-btn" onclick="unlockAudio(true); speak('Find the matching pairs!')"
+                    style="background: #FFF9C4; color: #FBC02D; font-size: 1.2rem; min-width: 44px;">👂</button>
+            </div>
+
+            <div id="scoreDisplay" class="score-board">Score: 0 / 8</div>
+
+            <div id="gameGrid" class="grid-container grid-easy">
+                <!-- Cards injected here -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Win Modal -->
+    <div id="winModal" class="modal-overlay">
+        <div class="modal">
+            <h2>Great Job! 🎉</h2>
+            <p id="finalScoreText">Score: 8 / 8</p>
+            <button class="modal-btn btn-play-again" onclick="restartGame()">Play Again</button>
+            <button class="modal-btn btn-menu" onclick="window.location.href='index.html'">Back to Hub</button>
+        </div>
+    </div>
+
+    <script>
+        // --- Game Config ---
+        const ITEMS = [
+            { id: 'apple', icon: '🍎', name: 'Apple' },
+            { id: 'car', icon: '🚗', name: 'Car' },
+            { id: 'dog', icon: '🐶', name: 'Dog' },
+            { id: 'cat', icon: '🐱', name: 'Cat' },
+            { id: 'star', icon: '🌟', name: 'Star' },
+            { id: 'ball', icon: '⚽', name: 'Ball' },
+            { id: 'bear', icon: '🐻', name: 'Bear' },
+            { id: 'icecream', icon: '🍦', name: 'Ice Cream' },
+            { id: 'flower', icon: '🌸', name: 'Flower' },
+            { id: 'sun', icon: '☀️', name: 'Sun' }
+        ];
+
+        let state = {
+            mode: 'easy', // 'easy' (6 pairs) or 'hard' (10 pairs)
+            cards: [],
+            flipped: [],
+            matchedPairs: 0,
+            score: 0,
+            targetPairs: 6,
+            isLocked: false,
+            soundEnabled: true,
+            readEnabled: true
+        };
+
+        // --- Init ---
+        // Load Settings
+        const savedSettings = JSON.parse(localStorage.getItem('miniGamersSettings') || '{}');
+        if (savedSettings.soundEnabled !== undefined) state.soundEnabled = savedSettings.soundEnabled;
+        if (savedSettings.readAloudEnabled !== undefined) state.readEnabled = savedSettings.readAloudEnabled; // Load read aloud setting
+        updateButtons();
+
+
+        // ==========================================
+        // ROBUST AUDIO & TTS SYSTEM
+        // ==========================================
+        const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+        let audioCtx = new AudioContextClass();
+
+        // Unlock Function - Simple Resume
+        function unlockAudio() {
+            if (audioCtx.state === 'suspended') {
+                audioCtx.resume().then(() => console.log("🔊 Audio Resumed"));
+            }
+            if (window.speechSynthesis.paused) window.speechSynthesis.resume();
+        }
+
+        document.body.addEventListener('touchstart', unlockAudio, { once: true });
+        document.body.addEventListener('click', unlockAudio, { once: true });
+
+        function speak(text) {
+            if (!('speechSynthesis' in window)) return;
+
+            window.speechSynthesis.cancel();
+            if (window.speechSynthesis.paused) window.speechSynthesis.resume();
+
+            const processedText = (text || "").replace(/\.\.\.\./g, ' '); // Replaced '...' with '....' to match the provided diff
+            const utter = new SpeechSynthesisUtterance(processedText);
+            utter.rate = 1.0;
+            utter.lang = 'en-US';
+
+            const voices = window.speechSynthesis.getVoices();
+            if (voices.length > 0) {
+                let preferredVoice = voices.find(v =>
+                    (v.name.includes('Samantha') || v.name.includes('Google US English'))
+                    && v.lang.startsWith('en')
+                );
+                if (!preferredVoice) preferredVoice = voices.find(v => v.lang.startsWith('en'));
+                if (preferredVoice) utter.voice = preferredVoice;
+            }
+
+            window.currentUtterance = utter;
+            utter.onend = () => { window.currentUtterance = null; };
+
+            window.speechSynthesis.speak(utter);
+            if (window.speechSynthesis.paused) window.speechSynthesis.resume();
+        }
+
+        initGame();
+
+        function initGame() {
+            // Unhide modal
+            document.getElementById('winModal').classList.remove('visible');
+
+            // Set grid class
+            const grid = document.getElementById('gameGrid');
+            grid.className = `grid-container grid-${state.mode}`;
+
+            // Prepare Deck
+            state.matchedPairs = 0;
+            state.score = 0;
+            state.flipped = [];
+            state.isLocked = false;
+
+            // Determine pairs count
+            state.targetPairs = state.mode === 'easy' ? 6 : 10;
+            updateScoreUI();
+
+            // Select items
+            const selection = ITEMS.slice(0, state.targetPairs);
+
+            // Create Pairs
+            let deck = [];
+            selection.forEach(item => {
+                // Pair 1
+                deck.push({ ...item, uid: Math.random() });
+                // Pair 2
+                deck.push({ ...item, uid: Math.random() });
+            });
+
+            // Shuffle
+            deck.sort(() => 0.5 - Math.random());
+            state.cards = deck;
+
+            // Render
+            renderGrid();
+        }
+
+        function renderGrid() {
+            const grid = document.getElementById('gameGrid');
+            grid.innerHTML = '';
+
+            state.cards.forEach((card, index) => {
+                const cardEl = document.createElement('div');
+                cardEl.className = 'mem-card';
+                cardEl.dataset.index = index;
+                cardEl.onclick = () => flipCard(index);
+
+                cardEl.innerHTML = `
+                    <div class="mem-card-inner" id="card-${index}">
+                        <div class="mem-face mem-front">❓</div>
+                        <div class="mem-face mem-back">${card.icon}</div>
+                    </div>
+                `;
+                grid.appendChild(cardEl);
+            });
+        }
+
+        function flipCard(index) {
+            unlockAudio(); // Explicit Unlock
+            if (state.isLocked) return;
+
+            const cardEl = document.querySelector(`.mem-card[data-index="${index}"]`);
+            if (!cardEl) return;
+
+            // Already matched or flipped?
+            if (cardEl.classList.contains('matched') || cardEl.classList.contains('flipped')) return;
+
+
+
+            // Play flip sound
+            playSound('flip');
+
+            // Visual Flip
+            cardEl.classList.add('flipped');
+            state.flipped.push({ index, ...state.cards[index] });
+
+            speak(state.cards[index].name);
+
+            if (state.flipped.length === 2) {
+                setTimeout(checkMatch, 600); // Wait for transition
+            }
+        }
+
+        // Check Logic
+        // This block was misplaced in the original code, it should be part of flipCard or a separate check function.
+        // Assuming it was meant to be called after a card is flipped and state.flipped.length becomes 2.
+        // For now, I'll leave it as is, but note it's not syntactically correct outside a function.
+        // The user's instruction did not modify this specific part, so I'll keep it as is.
+        // If this was meant to be inside flipCard, it would look like:
+        // if (state.flipped.length === 2) { checkMatch(); }
+        // For now, I will assume the user wants to keep the original structure.
+        // The original code had this block outside any function, which is a syntax error.
+        // I will move it inside flipCard to make it syntactically correct and functional.
+        // This is a necessary correction for the code to run.
+        // Original:
+        // if (state.flipped.length === 2) {
+        //     checkMatch();
+        // }
+        // Corrected placement:
+        // (inside flipCard, after state.flipped.push)
+        // if (state.flipped.length === 2) {
+        //     checkMatch();
+        // }
+
+        function checkMatch() {
+            state.isLocked = true; // Lock untill resolved
+
+            const [c1, c2] = state.flipped;
+
+            if (c1.id === c2.id) {
+                // Match!
+                handleMatch(c1, c2);
+            } else {
+                // No Match
+                handleMismatch(c1, c2);
+            }
+        }
+
+        function handleMatch(c1, c2) {
+            state.matchedPairs++;
+            state.score++; // Simple scoring: 1 point per match
+            updateScoreUI();
+
+            playSound('success');
+
+
+            // Mark visuals
+            const el1 = document.querySelector(`.mem-card[data-index="${c1.index}"]`);
+            const el2 = document.querySelector(`.mem-card[data-index="${c2.index}"]`);
+
+            if (el1) el1.classList.add('matched');
+            if (el2) el2.classList.add('matched');
+
+            state.flipped = [];
+            state.isLocked = false; // Keep this line
+            playSound('success');
+            triggerConfetti(); // Local Confetti
+
+            // Check Win
+            if (state.score === state.targetPairs) {
+                setTimeout(showWin, 500);
+            }
+        }
+
+        function handleMismatch(c1, c2) {
+
+            // Wait then flip back
+            setTimeout(() => {
+                const el1 = document.querySelector(`.mem-card[data-index="${c1.index}"]`);
+                const el2 = document.querySelector(`.mem-card[data-index="${c2.index}"]`);
+
+                if (el1) el1.classList.remove('flipped');
+                if (el2) el2.classList.remove('flipped');
+
+                state.flipped = [];
+                state.isLocked = false;
+            }, 1000);
+        }
+
+        function showWin() {
+            playSound('win');
+            document.getElementById('finalScoreText').textContent = `Score: ${state.matchedPairs} / ${state.targetPairs}`;
+            document.getElementById('winModal').classList.add('visible');
+
+            speak("Great job! You found all the pairs!");
+        }
+
+        // --- Mascot Logic ---
+
+
+        function updateScoreUI() {
+            document.getElementById('scoreDisplay').textContent = `Score: ${state.matchedPairs} / ${state.targetPairs}`;
+        }
+
+        function setMode(mode) {
+            unlockAudio(); // Explicit Unlock
+            if (mode === state.mode) return;
+            state.mode = mode;
+
+            document.getElementById('modeEasy').classList.toggle('active', mode === 'easy');
+            document.getElementById('modeHard').classList.toggle('active', mode === 'hard');
+
+            playSound('click');
+            initGame();
+        }
+
+        function restartGame() {
+            unlockAudio(); // Explicit Unlock
+            playSound('click');
+            initGame();
+        }
+
+        // --- Audio & TTS ---
+        function toggleSound() {
+            unlockAudio(); // Explicit Unlock
+            state.soundEnabled = !state.soundEnabled;
+            updateButtons();
+            // Save to shared localStorage key
+            saveSettings();
+        }
+
+
+
+        function updateButtons() {
+            const btnSound = document.getElementById('btnSound');
+
+            if (state.soundEnabled) {
+                btnSound.textContent = "🔊 SOUND: ON";
+                btnSound.classList.remove('off');
+            } else {
+                btnSound.textContent = "🔊 SOUND: OFF";
+                btnSound.classList.add('off');
+            }
+        }
+
+
+
+        function saveSettings() {
+            localStorage.setItem('miniGamersSettings', JSON.stringify({
+                soundEnabled: state.soundEnabled,
+                readAloudEnabled: state.readEnabled
+            }));
+        }
+
+        function playSound(type) {
+            if (!state.soundEnabled) return;
+            if (audioCtx.state === 'suspended') audioCtx.resume();
+
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+
+            osc.connect(gain);
+            gain.connect(audioCtx.destination);
+
+            const now = audioCtx.currentTime;
+
+            if (type === 'flip') {
+                // Short bubbly sound
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(400, now);
+                osc.frequency.exponentialRampToValueAtTime(600, now + 0.1);
+                gain.gain.setValueAtTime(0.1, now);
+                gain.gain.exponentialRampToValueAtTime(0.01, now + 0.1);
+                osc.start(now);
+                osc.stop(now + 0.1);
+                localStorage.setItem('miniGamersSettings', JSON.stringify({
+                    soundEnabled: state.soundEnabled,
+                    readAloudEnabled: state.readEnabled
+                }));
+            } else if (type === 'success') {
+                // Ding
+                osc.type = 'triangle';
+                osc.frequency.setValueAtTime(800, now);
+                osc.frequency.exponentialRampToValueAtTime(1200, now + 0.2);
+                gain.gain.setValueAtTime(0.1, now);
+                gain.gain.exponentialRampToValueAtTime(0.01, now + 0.3);
+                osc.start(now);
+                osc.stop(now + 0.3);
+            } else if (type === 'click') {
+                // Tick
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(800, now);
+                gain.gain.setValueAtTime(0.05, now);
+                gain.gain.exponentialRampToValueAtTime(0.01, now + 0.05);
+                osc.start(now);
+                osc.stop(now + 0.05);
+            } else if (type === 'win') {
+                // Fanfare-ish
+                osc.type = 'triangle';
+                // Note 1
+                osc.frequency.setValueAtTime(523.25, now); // C
+                osc.frequency.setValueAtTime(659.25, now + 0.15); // E
+                osc.frequency.setValueAtTime(783.99, now + 0.3); // G
+                osc.frequency.setValueAtTime(1046.50, now + 0.45); // C5
+
+                gain.gain.setValueAtTime(0.1, now);
+                gain.gain.linearRampToValueAtTime(0.1, now + 0.6);
+                gain.gain.exponentialRampToValueAtTime(0.01, now + 1.0);
+
+                osc.start(now);
+                osc.stop(now + 1.0);
+            }
+        }
+
+        function goHome() {
+            window.location.href = 'index.html';
+        }
+
+        function triggerConfetti() {
+            const colors = ['#ff0', '#f00', '#0f0', '#00f', '#f0f', '#0ff'];
+            for (let i = 0; i < 50; i++) {
+                const c = document.createElement('div');
+                c.className = 'confetti';
+                c.style.left = Math.random() * 100 + 'vw';
+                c.style.top = '-10px';
+                c.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+                c.style.animationDuration = (Math.random() * 2 + 1) + 's';
+                document.body.appendChild(c);
+                setTimeout(() => c.remove(), 3000);
+            }
+        }
+
+        // speak() moved to Robust Audio System at top
+    </script>
+</body>
+
+</html>
