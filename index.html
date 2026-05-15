@@ -1068,11 +1068,12 @@ function showPanel(id) {
 }
 
 // ===================== WELCOME =====================
-const glupWelcome    = new Audio('audio/glup-welcome.mp3');
-const glupWelcome2   = new Audio('audio/glup-welcome2.mp3');
-const glupSelectGame = new Audio('audio/glup-selectgame.mp3');
-const glupSleeping   = new Audio('audio/glup-sleeping.mp3');
-const bgMusic        = new Audio('audio/bg-sleep.mp3');
+const AV = '?v=2';
+const glupWelcome    = new Audio('audio/glup-welcome.mp3'    + AV);
+const glupWelcome2   = new Audio('audio/glup-welcome2.mp3'   + AV);
+const glupSelectGame = new Audio('audio/glup-selectgame.mp3' + AV);
+const glupSleeping   = new Audio('audio/glup-sleeping.mp3'   + AV);
+const bgMusic        = new Audio('audio/bg-sleep.mp3'        + AV);
 bgMusic.loop   = true;
 bgMusic.volume = 0.15;
 
