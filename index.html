@@ -31,18 +31,18 @@
             transition: background 1.2s ease;
         }
 
-        /* Vertical stripes on wall */
+        /* Polka-dot wallpaper */
         .room::before {
             content: '';
             position: absolute;
             left: 0; right: 0;
             top: 68px;
             height: calc(75vh - 68px);
-            background: repeating-linear-gradient(
-                90deg,
-                rgba(255,255,255,0.07) 0px, rgba(255,255,255,0.07) 52px,
-                transparent 52px, transparent 104px
-            );
+            background-image:
+                radial-gradient(circle, rgba(255,255,255,0.22) 6px, transparent 6px),
+                radial-gradient(circle, rgba(255,255,255,0.22) 6px, transparent 6px);
+            background-size: 48px 48px;
+            background-position: 0 0, 24px 24px;
         }
 
         /* Baseboard */
@@ -56,18 +56,97 @@
             box-shadow: 0 -2px 0 rgba(255,255,255,0.12);
         }
 
-        /* ===== CEILING LIGHTS ===== */
-        .ceiling-light {
+        /* ===== FLOOR PLANKS ===== */
+        .room-floor-pattern {
+            position: absolute;
+            left: 0; right: 0;
+            top: 75vh;
+            bottom: 0;
+            pointer-events: none;
+            background-image:
+                /* Bordes horizontales entre tablones */
+                repeating-linear-gradient(
+                    180deg,
+                    rgba(0,20,80,0.20) 0px, rgba(0,20,80,0.20) 2px,
+                    transparent 2px, transparent 34px
+                ),
+                /* Destello sutil en el centro de cada tablón */
+                repeating-linear-gradient(
+                    180deg,
+                    transparent 13px,
+                    rgba(255,255,255,0.06) 14px, rgba(255,255,255,0.06) 16px,
+                    transparent 17px, transparent 36px
+                ),
+                /* Juntas verticales — filas impares */
+                repeating-linear-gradient(
+                    90deg,
+                    rgba(0,20,80,0.12) 0px, rgba(0,20,80,0.12) 1.5px,
+                    transparent 1.5px, transparent 110px
+                ),
+                /* Juntas verticales — filas pares (desplazadas media celda) */
+                repeating-linear-gradient(
+                    90deg,
+                    rgba(0,20,80,0.12) 0px, rgba(0,20,80,0.12) 1.5px,
+                    transparent 1.5px, transparent 110px
+                );
+            background-size:
+                auto 36px,
+                auto 36px,
+                110px 72px,
+                110px 72px;
+            background-position:
+                0 0,
+                0 0,
+                0 0,
+                55px 36px;
+        }
+
+        /* ===== CEILING LAMPS ===== */
+        .ceiling-lamp {
             position: absolute;
             top: 0;
-            width: 60px;
-            height: 36px;
-            background: linear-gradient(180deg, rgba(255,255,255,0.22), transparent);
-            border-radius: 0 0 50% 50%;
+            transform: translateX(-50%);
+            transform-origin: top center;
+            pointer-events: none;
+            animation: lampSway 5.5s ease-in-out infinite;
         }
-        .ceiling-light:nth-child(1) { left: 20%; }
-        .ceiling-light:nth-child(2) { left: 50%; transform: translateX(-50%); }
-        .ceiling-light:nth-child(3) { right: 20%; }
+        .ceiling-lamp:nth-child(1) { left: 20%; }
+        .ceiling-lamp:nth-child(2) { left: 50%; animation-delay: 1.8s; }
+        .ceiling-lamp:nth-child(3) { left: 80%; animation-delay: 3.6s; }
+
+        @keyframes lampSway {
+            0%, 100% { transform: translateX(-50%) rotate(-1.5deg); }
+            50%       { transform: translateX(-50%) rotate(1.5deg);  }
+        }
+
+        .lamp-glow {
+            position: absolute;
+            top: 60px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 200px;
+            height: 220px;
+            background: radial-gradient(
+                ellipse 100px 110px at 50% 0%,
+                rgba(255,252,200,0.26) 0%,
+                rgba(255,248,180,0.11) 45%,
+                transparent 70%
+            );
+            pointer-events: none;
+            animation: lampGlow 5.5s ease-in-out infinite;
+        }
+        .ceiling-lamp:nth-child(2) .lamp-glow { animation-delay: 1.8s; }
+        .ceiling-lamp:nth-child(3) .lamp-glow { animation-delay: 3.6s; }
+
+        @keyframes lampGlow {
+            0%, 100% { opacity: 0.80; transform: translateX(-50%) scaleY(0.94); }
+            50%       { opacity: 1;    transform: translateX(-50%) scaleY(1.06); }
+        }
+
+        @media (max-width: 600px) {
+            .ceiling-lamp svg { width: 52px; height: 51px; }
+            .lamp-glow { width: 140px; height: 160px; top: 48px; }
+        }
 
         /* ===== DOORS ===== */
         .door {
@@ -76,16 +155,40 @@
             width: 80px;
             height: 126px;
             border-radius: 40px 40px 0 0;
+            overflow: hidden;
         }
+
+        /* Franja de luz en esquina superior izquierda */
+        .door::before {
+            content: '';
+            position: absolute;
+            top: 7px;
+            left: 5px;
+            width: 26px;
+            height: 62px;
+            border-radius: 50%;
+            background: radial-gradient(ellipse at 35% 25%,
+                rgba(255,255,255,0.42) 0%,
+                rgba(255,255,255,0.12) 45%,
+                transparent 72%);
+            pointer-events: none;
+        }
+
         .door-left {
             left: 5%;
             background: linear-gradient(160deg, #E040FB, #AD1FD4);
-            box-shadow: inset -5px 0 10px rgba(0,0,0,0.2), 4px 0 0 #7B1FA2;
+            box-shadow:
+                inset -7px 0 16px rgba(0,0,0,0.24),
+                inset 0 -10px 20px rgba(0,0,0,0.14),
+                4px 0 0 #7B1FA2;
         }
         .door-right {
             right: 5%;
             background: linear-gradient(160deg, #FF7043, #E64A19);
-            box-shadow: inset -5px 0 10px rgba(0,0,0,0.2), 4px 0 0 #BF360C;
+            box-shadow:
+                inset -7px 0 16px rgba(0,0,0,0.24),
+                inset 0 -10px 20px rgba(0,0,0,0.14),
+                4px 0 0 #BF360C;
         }
         .door-knob {
             position: absolute;
@@ -191,6 +294,16 @@
             pointer-events: none;
             transition: opacity 0.3s, bottom 0.6s ease;
         }
+
+        .speech-bubble.pop {
+            animation: bubblePop 0.22s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+        }
+
+        @keyframes bubblePop {
+            0%   { transform: scale(0.72); opacity: 0; }
+            65%  { transform: scale(1.06);             }
+            100% { transform: scale(1);   opacity: 1; }
+        }
         .speech-bubble::after {
             content: '';
             position: absolute;
@@ -204,9 +317,9 @@
         /* ===== PANELS ===== */
         .panel {
             position: fixed;
-            top: 6vh;
+            top: calc(37.5vh - 28px);
             left: 50%;
-            transform: translateX(-50%);
+            transform: translate(-50%, -50%);
             background: linear-gradient(175deg, #5FC5F0, #3DAEE0);
             border: 3px solid rgba(255,255,255,0.45);
             border-radius: 26px;
@@ -227,7 +340,7 @@
         .panel.hidden {
             opacity: 0;
             pointer-events: none;
-            transform: translateX(-50%) scale(0.88);
+            transform: translate(-50%, -50%) scale(0.88);
         }
 
         .panel-title {
@@ -566,6 +679,47 @@
             100% { opacity: 0.6; }
         }
 
+        /* ===== SPLASH GLUP ===== */
+        .splash-glup {
+            position: relative;
+            width: 180px;
+            height: 204px;
+            animation: splashFloat 3.4s ease-in-out infinite;
+            filter: drop-shadow(0 16px 24px rgba(0,0,0,0.25));
+        }
+
+        @keyframes splashFloat {
+            0%, 100% { transform: translateY(0)    rotate(-2deg); }
+            50%       { transform: translateY(-20px) rotate(2deg); }
+        }
+
+        .splash-zzz {
+            position: absolute;
+            top: 18px;
+            right: -10px;
+            pointer-events: none;
+            font-family: 'Fredoka One', cursive;
+            color: #a0c4ff;
+            text-shadow: 0 0 10px rgba(160,196,255,0.85);
+            line-height: 1;
+        }
+
+        .splash-zzz span { position: absolute; animation: splashZzz 2.6s ease-in-out infinite; }
+        .splash-zzz span:nth-child(1) { font-size: 1rem;  top: 0;    right: 0;    animation-delay: 0s;   }
+        .splash-zzz span:nth-child(2) { font-size: 1.5rem; top: -16px; right: 16px; animation-delay: 0.8s; }
+        .splash-zzz span:nth-child(3) { font-size: 2rem;  top: -36px; right: 36px; animation-delay: 1.6s; }
+
+        @keyframes splashZzz {
+            0%   { opacity: 0; transform: translate(0, 0)        scale(0.6); }
+            25%  { opacity: 1; }
+            100% { opacity: 0; transform: translate(24px, -56px) scale(1.2); }
+        }
+
+        @media (max-width: 600px) {
+            .splash-glup          { width: 138px; height: 156px; }
+            .splash-glup svg      { width: 138px; height: 156px; }
+        }
+
         /* ===== CONFETTI ===== */
         .confetti-piece {
             position: fixed;
@@ -584,7 +738,7 @@
         @media (max-width: 600px) {
             /* Panel full-width, shorter */
             .panel {
-                top: 4vh;
+                top: calc(37.5vh - 28px);
                 min-width: unset;
                 width: 92vw;
                 max-height: 54vh;
@@ -650,6 +804,95 @@
         /* ===== ROOM LEVEL COLORS ===== */
         .room.level-2 { background: linear-gradient(180deg, #1565C0 0px, #1976D2 68px, #66BB6A 68px, #66BB6A 75vh, #42A5F5 75vh, #64B5F6 100%); }
         .room.level-3 { background: linear-gradient(180deg, #B71C1C 0px, #C62828 68px, #FFB300 68px, #FFB300 75vh, #4CAF50 75vh, #66BB6A 100%); }
+
+        /* ===== ROOM FURNITURE ===== */
+        .wall-frame {
+            position: fixed;
+            z-index: 5;
+            filter: drop-shadow(3px 5px 8px rgba(0,0,0,0.22));
+            pointer-events: none;
+        }
+        /* ── ZONA IZQUIERDA (left ≤ 28%) ── */
+        .frame-5 { left: 14%;  top: calc(68px + 1vh);  transform: rotate(-2.5deg); } /* grande, alto */
+        .frame-1 { left: 3%;   top: calc(68px + 8vh);  transform: rotate(-2deg);   } /* pequeño, alto */
+        .frame-2 { left: 18%;  top: calc(68px + 22vh); transform: rotate(3deg);    } /* mediano, medio */
+        .frame-4 { left: 4%;   top: calc(68px + 32vh); transform: rotate(4deg);    } /* pequeño, bajo */
+
+        /* ── ZONA DERECHA — todos por encima de la burbuja (~42vh) ── */
+        .frame-3 { left: 64%;  top: calc(68px + 2vh);  transform: rotate(-1.5deg); } /* izq-der, muy alto */
+        .frame-9 { right: 5%;  top: calc(68px + 3vh);  transform: rotate(-1.5deg); } /* extremo der, alto */
+        .frame-7 { right: 22%; top: calc(68px + 8vh);  transform: rotate(-3deg);   } /* der-centro, alto  */
+        .frame-6 { left: 67%;  top: calc(68px + 13vh); transform: rotate(2deg);    } /* izq-der, medio    */
+        .frame-8 { right: 10%; top: calc(68px + 10vh); transform: rotate(3.5deg);  } /* der, medio        */
+
+        .room-sofa {
+            position: fixed;
+            bottom: calc(25vh + 12px);
+            left: calc(50% - 80px);
+            z-index: 12;
+            pointer-events: none;
+        }
+
+        .room-sofa::after {
+            content: '';
+            position: absolute;
+            bottom: -12px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 190px;
+            height: 24px;
+            background: radial-gradient(ellipse, rgba(0,0,0,0.22) 0%, transparent 68%);
+        }
+
+        @media (max-width: 600px) {
+            .room-sofa::after { width: 145px; height: 18px; }
+        }
+
+        .room-rug {
+            position: fixed;
+            bottom: calc(25vh - 22px);
+            left: calc(50% - 110px);
+            z-index: 8;
+            pointer-events: none;
+            animation: rugBreath 3s ease-in-out infinite;
+        }
+
+        @keyframes rugBreath {
+            0%, 100% { transform: scale(1)    translateY(0px);  }
+            50%       { transform: scale(1.08) translateY(-5px); }
+        }
+
+        @media (max-width: 600px) {
+            .room-sofa { left: calc(50% - 60px); bottom: calc(22vh + 10px); }
+            .room-sofa svg { width: 120px; height: 83px; }
+            .room-rug   { left: calc(50% - 80px); bottom: calc(22vh - 18px); }
+            .room-rug svg { width: 160px; height: 41px; }
+            .wall-frame svg { width: 50px; height: 57px; }
+            /* Zona izquierda mobile */
+            .frame-5 { left: 10%;  top: calc(68px + 1vh);  }
+            .frame-5 svg { width: 65px; height: 72px; }
+            .frame-1 { left: 2%;   top: calc(68px + 9vh);  }
+            .frame-2 { left: 14%;  top: calc(68px + 22vh); }
+            .frame-4 { left: 2%;   top: calc(68px + 32vh); }
+            /* Zona derecha mobile — todos en zona alta */
+            .frame-3 { left: auto; right: 30%; top: calc(68px + 2vh);  }
+            .frame-9 { left: auto; right: 4%;  top: calc(68px + 3vh);  }
+            .frame-9 svg { width: 48px; height: 56px; }
+            .frame-7 { left: auto; right: 18%; top: calc(68px + 8vh);  }
+            .frame-7 svg { width: 55px; height: 62px; }
+            .frame-6 { left: auto; right: 28%; top: calc(68px + 13vh); }
+            .frame-6 svg { width: 52px; height: 59px; }
+            .frame-8 { left: auto; right: 5%;  top: calc(68px + 10vh); }
+            .frame-8 svg { width: 44px; height: 52px; }
+        }
+
+        @media (max-width: 380px) {
+            .frame-5 { left: 8%; }
+            .frame-3 { right: 12%; }
+            .frame-7 { right: 15%; }
+            .frame-9 { right: 3%; }
+            .frame-8 { right: 3%; }
+        }
     </style>
 </head>
 <body>
@@ -658,20 +901,425 @@
 <div class="splash" id="splashScreen">
     <div class="splash-stars">⭐ 🌟 ⭐</div>
     <div class="splash-title">Mini Gamers Club</div>
+
+    <!-- Glup dormido -->
+    <div class="splash-glup">
+        <svg viewBox="0 0 150 170" xmlns="http://www.w3.org/2000/svg" width="180" height="204">
+            <!-- Sombra -->
+            <ellipse cx="75" cy="165" rx="45" ry="7" fill="rgba(0,0,0,0.12)"/>
+            <!-- Cuerpo -->
+            <ellipse cx="75" cy="110" rx="62" ry="55" fill="#F9E07A"/>
+            <ellipse cx="75" cy="113" rx="57" ry="50" fill="#FCED8E"/>
+            <!-- Cuernos -->
+            <ellipse cx="58" cy="60" rx="8" ry="13" fill="#F0D060" transform="rotate(-15 58 60)"/>
+            <ellipse cx="92" cy="60" rx="8" ry="13" fill="#F0D060" transform="rotate(15 92 60)"/>
+            <!-- Ojos cerrados -->
+            <path d="M 41 91  Q 54 101 67 91"    stroke="#8B5E00" stroke-width="4"   fill="none" stroke-linecap="round"/>
+            <path d="M 62 85  Q 75 95  88 85"    stroke="#8B5E00" stroke-width="4"   fill="none" stroke-linecap="round"/>
+            <path d="M 83 91  Q 96 101 109 91"   stroke="#8B5E00" stroke-width="4"   fill="none" stroke-linecap="round"/>
+            <path d="M 36 109 Q 44 117 52 109"   stroke="#8B5E00" stroke-width="3.5" fill="none" stroke-linecap="round"/>
+            <path d="M 98 109 Q 106 117 114 109" stroke="#8B5E00" stroke-width="3.5" fill="none" stroke-linecap="round"/>
+            <!-- Boca dormida -->
+            <path d="M 63 134 Q 75 140 87 134" stroke="#8B5E00" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+            <!-- Brazos -->
+            <ellipse cx="15"  cy="122" rx="16" ry="9" fill="#FCED8E" transform="rotate(-18 15 122)"/>
+            <ellipse cx="135" cy="122" rx="16" ry="9" fill="#FCED8E" transform="rotate(18 135 122)"/>
+            <!-- Pies -->
+            <ellipse cx="56" cy="160" rx="20" ry="9" fill="#F0D060"/>
+            <ellipse cx="94" cy="160" rx="20" ry="9" fill="#F0D060"/>
+        </svg>
+        <div class="splash-zzz">
+            <span>z</span>
+            <span>z</span>
+            <span>Z</span>
+        </div>
+    </div>
+
     <div class="splash-sub">Learning is more fun with Glup!</div>
-    <div class="splash-tap">👆 Tap to Start!</div>
+    <div class="splash-tap">👆 Wake Up Glup!</div>
 </div>
 
 <!-- ========== ROOM ========== -->
 <div class="room" id="theRoom">
-    <div class="ceiling-light"></div>
-    <div class="ceiling-light"></div>
-    <div class="ceiling-light"></div>
+
+    <!-- Lámpara 1 -->
+    <div class="ceiling-lamp">
+        <svg viewBox="0 0 70 68" width="70" height="68" xmlns="http://www.w3.org/2000/svg">
+            <rect x="22" y="0"   width="26" height="7"   rx="3" fill="#C8962A"/>
+            <rect x="25" y="1.5" width="20" height="4"   rx="2" fill="#E8B840"/>
+            <rect x="32" y="7"   width="6"  height="18"  rx="3" fill="#B88020"/>
+            <path d="M 22 25 L 5 62 L 65 62 L 48 25 Z"           fill="#FFCC44"/>
+            <path d="M 22 25 L 12 45 L 5 62 L 18 62 L 28 40 Z"   fill="rgba(255,255,255,0.16)"/>
+            <path d="M 48 25 L 58 45 L 65 62 L 52 62 L 42 40 Z"  fill="rgba(0,0,0,0.09)"/>
+            <ellipse cx="35" cy="62"  rx="30"  ry="5"    fill="#D4920A"/>
+            <ellipse cx="35" cy="61"  rx="28"  ry="3.5"  fill="#FFDD60"/>
+            <ellipse cx="35" cy="34"  rx="9"   ry="11"   fill="rgba(255,255,220,0.85)"/>
+            <ellipse cx="35" cy="32"  rx="5.5" ry="7"    fill="rgba(255,255,200,0.95)"/>
+        </svg>
+        <div class="lamp-glow"></div>
+    </div>
+
+    <!-- Lámpara 2 -->
+    <div class="ceiling-lamp">
+        <svg viewBox="0 0 70 68" width="70" height="68" xmlns="http://www.w3.org/2000/svg">
+            <rect x="22" y="0"   width="26" height="7"   rx="3" fill="#C8962A"/>
+            <rect x="25" y="1.5" width="20" height="4"   rx="2" fill="#E8B840"/>
+            <rect x="32" y="7"   width="6"  height="18"  rx="3" fill="#B88020"/>
+            <path d="M 22 25 L 5 62 L 65 62 L 48 25 Z"           fill="#FFCC44"/>
+            <path d="M 22 25 L 12 45 L 5 62 L 18 62 L 28 40 Z"   fill="rgba(255,255,255,0.16)"/>
+            <path d="M 48 25 L 58 45 L 65 62 L 52 62 L 42 40 Z"  fill="rgba(0,0,0,0.09)"/>
+            <ellipse cx="35" cy="62"  rx="30"  ry="5"    fill="#D4920A"/>
+            <ellipse cx="35" cy="61"  rx="28"  ry="3.5"  fill="#FFDD60"/>
+            <ellipse cx="35" cy="34"  rx="9"   ry="11"   fill="rgba(255,255,220,0.85)"/>
+            <ellipse cx="35" cy="32"  rx="5.5" ry="7"    fill="rgba(255,255,200,0.95)"/>
+        </svg>
+        <div class="lamp-glow"></div>
+    </div>
+
+    <!-- Lámpara 3 -->
+    <div class="ceiling-lamp">
+        <svg viewBox="0 0 70 68" width="70" height="68" xmlns="http://www.w3.org/2000/svg">
+            <rect x="22" y="0"   width="26" height="7"   rx="3" fill="#C8962A"/>
+            <rect x="25" y="1.5" width="20" height="4"   rx="2" fill="#E8B840"/>
+            <rect x="32" y="7"   width="6"  height="18"  rx="3" fill="#B88020"/>
+            <path d="M 22 25 L 5 62 L 65 62 L 48 25 Z"           fill="#FFCC44"/>
+            <path d="M 22 25 L 12 45 L 5 62 L 18 62 L 28 40 Z"   fill="rgba(255,255,255,0.16)"/>
+            <path d="M 48 25 L 58 45 L 65 62 L 52 62 L 42 40 Z"  fill="rgba(0,0,0,0.09)"/>
+            <ellipse cx="35" cy="62"  rx="30"  ry="5"    fill="#D4920A"/>
+            <ellipse cx="35" cy="61"  rx="28"  ry="3.5"  fill="#FFDD60"/>
+            <ellipse cx="35" cy="34"  rx="9"   ry="11"   fill="rgba(255,255,220,0.85)"/>
+            <ellipse cx="35" cy="32"  rx="5.5" ry="7"    fill="rgba(255,255,200,0.95)"/>
+        </svg>
+        <div class="lamp-glow"></div>
+    </div>
+
+    <div class="room-floor-pattern"></div>
 </div>
 
 <!-- Room decorations -->
 <div class="door door-left"><div class="door-window"></div><div class="door-knob"></div></div>
 <div class="door door-right"><div class="door-window"></div><div class="door-knob"></div></div>
+
+<!-- ========== WALL FRAMES ========== -->
+<!-- Frame 1: Glup feliz con estrellas -->
+<div class="wall-frame frame-1">
+  <svg viewBox="0 0 70 80" width="70" height="80" xmlns="http://www.w3.org/2000/svg">
+    <rect x="0" y="0" width="70" height="80" rx="6" fill="#7B2FBE"/>
+    <rect x="3" y="3" width="64" height="74" rx="4" fill="#9B45D8"/>
+    <rect x="7" y="7" width="56" height="66" rx="3" fill="#FFFDE7"/>
+    <!-- Estrellas decorativas -->
+    <text x="10" y="19" font-size="8" fill="#FFD700">⭐</text>
+    <text x="50" y="17" font-size="7" fill="#FFD700">✨</text>
+    <!-- Cuerpo Glup -->
+    <ellipse cx="35" cy="47" rx="19" ry="16" fill="#F9E07A"/>
+    <ellipse cx="35" cy="49" rx="17" ry="14" fill="#FCED8E"/>
+    <!-- Cuernos -->
+    <ellipse cx="26" cy="33" rx="3" ry="5.5" fill="#F0D060" transform="rotate(-13 26 33)"/>
+    <ellipse cx="44" cy="33" rx="3" ry="5.5" fill="#F0D060" transform="rotate(13 44 33)"/>
+    <!-- Ojos (3) -->
+    <circle cx="25" cy="41" r="4.2" fill="white"/><circle cx="35" cy="38" r="4.2" fill="white"/><circle cx="45" cy="41" r="4.2" fill="white"/>
+    <circle cx="25" cy="42" r="2.3" fill="#6B2D90"/><circle cx="35" cy="39" r="2.3" fill="#6B2D90"/><circle cx="45" cy="42" r="2.3" fill="#6B2D90"/>
+    <circle cx="26" cy="41" r="0.9" fill="white"/><circle cx="36" cy="38" r="0.9" fill="white"/><circle cx="46" cy="41" r="0.9" fill="white"/>
+    <!-- Sonrisa -->
+    <path d="M 26 55 Q 35 63 44 55" stroke="#8B5E00" stroke-width="2" fill="none" stroke-linecap="round"/>
+    <!-- Pies -->
+    <ellipse cx="26" cy="64" rx="7.5" ry="3.5" fill="#F0D060"/>
+    <ellipse cx="44" cy="64" rx="7.5" ry="3.5" fill="#F0D060"/>
+  </svg>
+</div>
+
+<!-- Frame 2: Glup bajo un arcoíris -->
+<div class="wall-frame frame-2">
+  <svg viewBox="0 0 70 80" width="70" height="80" xmlns="http://www.w3.org/2000/svg">
+    <rect x="0" y="0" width="70" height="80" rx="6" fill="#FF7043"/>
+    <rect x="3" y="3" width="64" height="74" rx="4" fill="#FF8A65"/>
+    <rect x="7" y="7" width="56" height="66" rx="3" fill="#E8F5E9"/>
+    <!-- Arcoíris -->
+    <path d="M 10 38 Q 35 8 60 38"  stroke="#F44336" stroke-width="3.5" fill="none"/>
+    <path d="M 12 40 Q 35 12 58 40" stroke="#FF9800" stroke-width="3.5" fill="none"/>
+    <path d="M 14 42 Q 35 16 56 42" stroke="#FFEB3B" stroke-width="3.5" fill="none"/>
+    <path d="M 16 44 Q 35 20 54 44" stroke="#4CAF50" stroke-width="3.5" fill="none"/>
+    <path d="M 18 46 Q 35 24 52 46" stroke="#2196F3" stroke-width="3.5" fill="none"/>
+    <!-- Glup debajo -->
+    <ellipse cx="35" cy="59" rx="16" ry="13" fill="#F9E07A"/>
+    <ellipse cx="35" cy="61" rx="14" ry="11" fill="#FCED8E"/>
+    <!-- Ojos (3) -->
+    <circle cx="26" cy="54" r="3.8" fill="white"/><circle cx="35" cy="51" r="3.8" fill="white"/><circle cx="44" cy="54" r="3.8" fill="white"/>
+    <circle cx="26" cy="55" r="2.1" fill="#6B2D90"/><circle cx="35" cy="52" r="2.1" fill="#6B2D90"/><circle cx="44" cy="55" r="2.1" fill="#6B2D90"/>
+    <circle cx="27" cy="54" r="0.9" fill="white"/><circle cx="36" cy="51" r="0.9" fill="white"/><circle cx="45" cy="54" r="0.9" fill="white"/>
+    <!-- Sonrisa grande -->
+    <path d="M 26 65 Q 35 73 44 65" stroke="#8B5E00" stroke-width="2" fill="none" stroke-linecap="round"/>
+    <!-- Pies -->
+    <ellipse cx="27" cy="72" rx="6.5" ry="3" fill="#F0D060"/>
+    <ellipse cx="43" cy="72" rx="6.5" ry="3" fill="#F0D060"/>
+  </svg>
+</div>
+
+<!-- Frame 3: Glup durmiendo (noche) -->
+<div class="wall-frame frame-3">
+  <svg viewBox="0 0 70 80" width="70" height="80" xmlns="http://www.w3.org/2000/svg">
+    <rect x="0" y="0" width="70" height="80" rx="6" fill="#00897B"/>
+    <rect x="3" y="3" width="64" height="74" rx="4" fill="#26A69A"/>
+    <rect x="7" y="7" width="56" height="66" rx="3" fill="#1A237E"/>
+    <!-- Estrellas en cielo -->
+    <circle cx="14" cy="14" r="1.5" fill="white"/><circle cx="22" cy="11" r="1" fill="white"/>
+    <circle cx="32" cy="15" r="1.5" fill="white"/><circle cx="48" cy="12" r="1" fill="white"/>
+    <circle cx="60" cy="16" r="1.5" fill="white"/>
+    <!-- Luna creciente -->
+    <circle cx="56" cy="22" r="8" fill="#FFEE58"/>
+    <circle cx="60" cy="19" r="6.5" fill="#1A237E"/>
+    <!-- Glup dormido -->
+    <ellipse cx="35" cy="54" rx="19" ry="16" fill="#F9E07A"/>
+    <ellipse cx="35" cy="56" rx="17" ry="14" fill="#FCED8E"/>
+    <!-- Cuernos -->
+    <ellipse cx="26" cy="40" rx="3" ry="5.5" fill="#F0D060" transform="rotate(-13 26 40)"/>
+    <ellipse cx="44" cy="40" rx="3" ry="5.5" fill="#F0D060" transform="rotate(13 44 40)"/>
+    <!-- Ojos cerrados -->
+    <path d="M 18 49 Q 25 55 32 49" stroke="#8B5E00" stroke-width="2.2" fill="none" stroke-linecap="round"/>
+    <path d="M 28 46 Q 35 52 42 46" stroke="#8B5E00" stroke-width="2.2" fill="none" stroke-linecap="round"/>
+    <path d="M 38 49 Q 45 55 52 49" stroke="#8B5E00" stroke-width="2.2" fill="none" stroke-linecap="round"/>
+    <!-- Boca dormida -->
+    <path d="M 28 61 Q 35 65 42 61" stroke="#8B5E00" stroke-width="1.8" fill="none" stroke-linecap="round"/>
+    <!-- ZZZ -->
+    <text x="43" y="38" font-size="6"  fill="#a0c4ff" font-family="sans-serif" font-weight="bold">z</text>
+    <text x="49" y="33" font-size="8"  fill="#a0c4ff" font-family="sans-serif" font-weight="bold">z</text>
+    <text x="56" y="27" font-size="10" fill="#a0c4ff" font-family="sans-serif" font-weight="bold">Z</text>
+    <!-- Pies -->
+    <ellipse cx="26" cy="69" rx="7.5" ry="3.5" fill="#F0D060"/>
+    <ellipse cx="44" cy="69" rx="7.5" ry="3.5" fill="#F0D060"/>
+  </svg>
+</div>
+
+<!-- Frame 4: Glup con gorrito de fiesta (pequeño, lima) -->
+<div class="wall-frame frame-4">
+  <svg viewBox="0 0 50 60" width="50" height="60" xmlns="http://www.w3.org/2000/svg">
+    <rect x="0" y="0" width="50" height="60" rx="5" fill="#7CB342"/>
+    <rect x="2.5" y="2.5" width="45" height="55" rx="3.5" fill="#9CCC65"/>
+    <rect x="5" y="5" width="40" height="50" rx="3" fill="#F9FBE7"/>
+    <!-- Gorro de fiesta -->
+    <polygon points="25,9 17,24 33,24" fill="#FF5252"/>
+    <polygon points="17,24 33,24 31,26 19,26" fill="#E53935"/>
+    <line x1="21" y1="12" x2="25" y2="24" stroke="rgba(255,255,255,0.55)" stroke-width="1.2"/>
+    <circle cx="25" cy="8" r="2.8" fill="#FFD700"/>
+    <!-- Confetti -->
+    <rect x="9"  y="11" width="3.5" height="3.5" rx="1" fill="#FF9800" transform="rotate(20 9 11)"/>
+    <rect x="37" y="9"  width="3"   height="3"   rx="1" fill="#E040FB" transform="rotate(-18 37 9)"/>
+    <rect x="40" y="19" width="3"   height="3"   rx="1" fill="#00BCD4" transform="rotate(28 40 19)"/>
+    <circle cx="12" cy="22" r="2" fill="#FF4081"/>
+    <!-- Cuerpo Glup -->
+    <ellipse cx="25" cy="39" rx="13" ry="11" fill="#F9E07A"/>
+    <ellipse cx="25" cy="41" rx="11" ry="9.5" fill="#FCED8E"/>
+    <ellipse cx="18" cy="29" rx="2.5" ry="4.5" fill="#F0D060" transform="rotate(-13 18 29)"/>
+    <ellipse cx="32" cy="29" rx="2.5" ry="4.5" fill="#F0D060" transform="rotate(13 32 29)"/>
+    <circle cx="18" cy="34" r="3.2" fill="white"/><circle cx="25" cy="32" r="3.2" fill="white"/><circle cx="32" cy="34" r="3.2" fill="white"/>
+    <circle cx="18" cy="35" r="1.8" fill="#6B2D90"/><circle cx="25" cy="33" r="1.8" fill="#6B2D90"/><circle cx="32" cy="35" r="1.8" fill="#6B2D90"/>
+    <circle cx="18.7" cy="34" r="0.7" fill="white"/><circle cx="25.7" cy="32" r="0.7" fill="white"/><circle cx="32.7" cy="34" r="0.7" fill="white"/>
+    <path d="M 18 44 Q 25 51 32 44" stroke="#8B5E00" stroke-width="1.8" fill="none" stroke-linecap="round"/>
+    <ellipse cx="19" cy="51" rx="6" ry="2.8" fill="#F0D060"/>
+    <ellipse cx="31" cy="51" rx="6" ry="2.8" fill="#F0D060"/>
+  </svg>
+</div>
+
+<!-- Frame 5: Glup bailando con notas musicales (grande, coral) -->
+<div class="wall-frame frame-5">
+  <svg viewBox="0 0 90 100" width="90" height="100" xmlns="http://www.w3.org/2000/svg">
+    <rect x="0" y="0" width="90" height="100" rx="8" fill="#FF5722"/>
+    <rect x="4" y="4" width="82" height="92" rx="5.5" fill="#FF7043"/>
+    <rect x="8" y="8" width="74" height="84" rx="4" fill="#FFF8E1"/>
+    <!-- Notas musicales -->
+    <text x="11" y="27" font-size="15" fill="#7B2FBE">♪</text>
+    <text x="67" y="24" font-size="13" fill="#E040FB">♫</text>
+    <text x="77" y="43" font-size="11" fill="#FF9800">♩</text>
+    <!-- Brazos levantados -->
+    <ellipse cx="16" cy="57" rx="10" ry="5.5" fill="#FCED8E" transform="rotate(-50 16 57)"/>
+    <ellipse cx="74" cy="57" rx="10" ry="5.5" fill="#FCED8E" transform="rotate(50 74 57)"/>
+    <!-- Cuerpo Glup grande -->
+    <ellipse cx="45" cy="63" rx="24" ry="20" fill="#F9E07A"/>
+    <ellipse cx="45" cy="65" rx="21" ry="17.5" fill="#FCED8E"/>
+    <ellipse cx="33" cy="45" rx="4" ry="7" fill="#F0D060" transform="rotate(-13 33 45)"/>
+    <ellipse cx="57" cy="45" rx="4" ry="7" fill="#F0D060" transform="rotate(13 57 45)"/>
+    <circle cx="32" cy="56" r="6"   fill="white"/><circle cx="45" cy="53" r="6"   fill="white"/><circle cx="58" cy="56" r="6"   fill="white"/>
+    <circle cx="32" cy="57" r="3.3" fill="#6B2D90"/><circle cx="45" cy="54" r="3.3" fill="#6B2D90"/><circle cx="58" cy="57" r="3.3" fill="#6B2D90"/>
+    <circle cx="33" cy="56" r="1.3" fill="white"/><circle cx="46" cy="53" r="1.3" fill="white"/><circle cx="59" cy="56" r="1.3" fill="white"/>
+    <path d="M 31 74 Q 45 85 59 74" stroke="#8B5E00" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+    <rect x="37"  y="76" width="5" height="5.5" rx="1.5" fill="white"/>
+    <rect x="43.5" y="77.5" width="5" height="5.5" rx="1.5" fill="white"/>
+    <rect x="50"  y="76" width="5" height="5.5" rx="1.5" fill="white"/>
+    <ellipse cx="33" cy="85" rx="10" ry="4.5" fill="#F0D060"/>
+    <ellipse cx="57" cy="85" rx="10" ry="4.5" fill="#F0D060"/>
+  </svg>
+</div>
+
+<!-- Frame 6: Glup con corazones (mediano, rojo) -->
+<div class="wall-frame frame-6">
+  <svg viewBox="0 0 75 85" width="75" height="85" xmlns="http://www.w3.org/2000/svg">
+    <rect x="0" y="0" width="75" height="85" rx="7" fill="#C62828"/>
+    <rect x="3.5" y="3.5" width="68" height="78" rx="5" fill="#E53935"/>
+    <rect x="7" y="7" width="61" height="71" rx="4" fill="#FCE4EC"/>
+    <!-- Corazón suave de fondo -->
+    <path d="M 37.5 58 C 37.5 58 13 44 13 30 C 13 21 20 15 28 19 C 32 21 35.5 24.5 37.5 28 C 39.5 24.5 43 21 47 19 C 55 15 62 21 62 30 C 62 44 37.5 58 37.5 58 Z" fill="#FF4081" opacity="0.22"/>
+    <!-- Corazoncitos flotantes -->
+    <text x="9"  y="22" font-size="10" fill="#FF4081">♥</text>
+    <text x="57" y="18" font-size="8"  fill="#FF80AB">♥</text>
+    <text x="62" y="30" font-size="9"  fill="#FF4081">♥</text>
+    <!-- Glup -->
+    <ellipse cx="37" cy="54" rx="20" ry="17" fill="#F9E07A"/>
+    <ellipse cx="37" cy="56" rx="18" ry="15" fill="#FCED8E"/>
+    <ellipse cx="28" cy="39" rx="3.5" ry="6" fill="#F0D060" transform="rotate(-13 28 39)"/>
+    <ellipse cx="46" cy="39" rx="3.5" ry="6" fill="#F0D060" transform="rotate(13 46 39)"/>
+    <circle cx="27" cy="47" r="4.8" fill="white"/><circle cx="37" cy="44" r="4.8" fill="white"/><circle cx="47" cy="47" r="4.8" fill="white"/>
+    <circle cx="27" cy="48" r="2.7" fill="#6B2D90"/><circle cx="37" cy="45" r="2.7" fill="#6B2D90"/><circle cx="47" cy="48" r="2.7" fill="#6B2D90"/>
+    <circle cx="28" cy="47" r="1.1" fill="white"/><circle cx="38" cy="44" r="1.1" fill="white"/><circle cx="48" cy="47" r="1.1" fill="white"/>
+    <path d="M 27 61 Q 37 70 47 61" stroke="#8B5E00" stroke-width="2" fill="none" stroke-linecap="round"/>
+    <ellipse cx="28" cy="72" rx="8" ry="3.8" fill="#F0D060"/>
+    <ellipse cx="46" cy="72" rx="8" ry="3.8" fill="#F0D060"/>
+  </svg>
+</div>
+
+<!-- Frame 7: Glup con corona de rey (mediano, dorado) -->
+<div class="wall-frame frame-7">
+  <svg viewBox="0 0 80 90" width="80" height="90" xmlns="http://www.w3.org/2000/svg">
+    <rect x="0" y="0" width="80" height="90" rx="7" fill="#F57F17"/>
+    <rect x="3.5" y="3.5" width="73" height="83" rx="5" fill="#F9A825"/>
+    <rect x="7" y="7" width="66" height="76" rx="4" fill="#FFFDE7"/>
+    <!-- Corona flotante -->
+    <polygon points="40,12 28,26 34,21 40,28 46,21 52,26" fill="#FFD700"/>
+    <rect x="28" y="25" width="24" height="6" rx="2" fill="#FFC107"/>
+    <circle cx="40" cy="11" r="3"   fill="#FF5722"/>
+    <circle cx="28" cy="26" r="2.5" fill="#4CAF50"/>
+    <circle cx="52" cy="26" r="2.5" fill="#E91E63"/>
+    <!-- Estrellas decorativas -->
+    <text x="9"  y="22" font-size="10" fill="#FFD700">★</text>
+    <text x="62" y="20" font-size="9"  fill="#FFD700">★</text>
+    <!-- Glup realeza -->
+    <ellipse cx="40" cy="57" rx="21" ry="18" fill="#F9E07A"/>
+    <ellipse cx="40" cy="59" rx="19" ry="16" fill="#FCED8E"/>
+    <ellipse cx="30" cy="41" rx="3.5" ry="6" fill="#F0D060" transform="rotate(-13 30 41)"/>
+    <ellipse cx="50" cy="41" rx="3.5" ry="6" fill="#F0D060" transform="rotate(13 50 41)"/>
+    <circle cx="29" cy="51" r="5"   fill="white"/><circle cx="40" cy="48" r="5"   fill="white"/><circle cx="51" cy="51" r="5"   fill="white"/>
+    <circle cx="29" cy="52" r="2.8" fill="#6B2D90"/><circle cx="40" cy="49" r="2.8" fill="#6B2D90"/><circle cx="51" cy="52" r="2.8" fill="#6B2D90"/>
+    <circle cx="30" cy="51" r="1.1" fill="white"/><circle cx="41" cy="48" r="1.1" fill="white"/><circle cx="52" cy="51" r="1.1" fill="white"/>
+    <path d="M 29 65 Q 40 75 51 65" stroke="#8B5E00" stroke-width="2.2" fill="none" stroke-linecap="round"/>
+    <rect x="35" y="67" width="5" height="5" rx="1.5" fill="white"/>
+    <rect x="41" y="68" width="5" height="5" rx="1.5" fill="white"/>
+    <ellipse cx="30" cy="77" rx="9" ry="4" fill="#F0D060"/>
+    <ellipse cx="50" cy="77" rx="9" ry="4" fill="#F0D060"/>
+  </svg>
+</div>
+
+<!-- Frame 8: Glup con flor gigante (pequeño, verde-menta) -->
+<div class="wall-frame frame-8">
+  <svg viewBox="0 0 55 65" width="55" height="65" xmlns="http://www.w3.org/2000/svg">
+    <rect x="0" y="0" width="55" height="65" rx="5.5" fill="#00796B"/>
+    <rect x="2.5" y="2.5" width="50" height="60" rx="4" fill="#26A69A"/>
+    <rect x="5" y="5" width="45" height="55" rx="3" fill="#E0F2F1"/>
+    <!-- Pétalos de flor -->
+    <circle cx="27" cy="12" r="5.5" fill="#FF80AB"/>
+    <circle cx="35" cy="16" r="5.5" fill="#FF80AB"/>
+    <circle cx="36" cy="25" r="5.5" fill="#FF80AB"/>
+    <circle cx="27" cy="29" r="5.5" fill="#FF80AB"/>
+    <circle cx="18" cy="25" r="5.5" fill="#FF80AB"/>
+    <circle cx="19" cy="16" r="5.5" fill="#FF80AB"/>
+    <!-- Centro flor -->
+    <circle cx="27" cy="21" r="7" fill="#FFD700"/>
+    <circle cx="27" cy="21" r="4.5" fill="#FFA000"/>
+    <!-- Tallo -->
+    <line x1="27" y1="27" x2="27" y2="38" stroke="#4CAF50" stroke-width="2.5" stroke-linecap="round"/>
+    <!-- Hojita -->
+    <ellipse cx="21" cy="35" rx="5.5" ry="3" fill="#66BB6A" transform="rotate(-35 21 35)"/>
+    <!-- Glup debajo de la flor -->
+    <ellipse cx="27" cy="50" rx="13" ry="11" fill="#F9E07A"/>
+    <ellipse cx="27" cy="52" rx="11" ry="9.5" fill="#FCED8E"/>
+    <ellipse cx="20" cy="40" rx="2.5" ry="4.2" fill="#F0D060" transform="rotate(-13 20 40)"/>
+    <ellipse cx="34" cy="40" rx="2.5" ry="4.2" fill="#F0D060" transform="rotate(13 34 40)"/>
+    <circle cx="20" cy="45" r="3.2" fill="white"/><circle cx="27" cy="43" r="3.2" fill="white"/><circle cx="34" cy="45" r="3.2" fill="white"/>
+    <circle cx="20" cy="46" r="1.8" fill="#6B2D90"/><circle cx="27" cy="44" r="1.8" fill="#6B2D90"/><circle cx="34" cy="46" r="1.8" fill="#6B2D90"/>
+    <circle cx="20.7" cy="45" r="0.7" fill="white"/><circle cx="27.7" cy="43" r="0.7" fill="white"/><circle cx="34.7" cy="45" r="0.7" fill="white"/>
+    <path d="M 20 54 Q 27 61 34 54" stroke="#8B5E00" stroke-width="1.8" fill="none" stroke-linecap="round"/>
+    <ellipse cx="21" cy="61" rx="5.5" ry="2.5" fill="#F0D060"/>
+    <ellipse cx="33" cy="61" rx="5.5" ry="2.5" fill="#F0D060"/>
+  </svg>
+</div>
+
+<!-- Frame 9: Glup en el espacio (pequeño, morado oscuro) -->
+<div class="wall-frame frame-9">
+  <svg viewBox="0 0 60 70" width="60" height="70" xmlns="http://www.w3.org/2000/svg">
+    <rect x="0" y="0" width="60" height="70" rx="6" fill="#4527A0"/>
+    <rect x="3" y="3" width="54" height="64" rx="4.5" fill="#5E35B1"/>
+    <rect x="6" y="6" width="48" height="58" rx="3.5" fill="#0D0D2B"/>
+    <!-- Estrellas -->
+    <circle cx="11" cy="12" r="1.5" fill="white"/><circle cx="20" cy="9"  r="1"   fill="white"/>
+    <circle cx="31" cy="14" r="1.5" fill="white"/><circle cx="43" cy="10" r="1"   fill="white"/>
+    <circle cx="52" cy="15" r="1.5" fill="white"/><circle cx="48" cy="24" r="1"   fill="white"/>
+    <circle cx="10" cy="26" r="1"   fill="white"/><circle cx="15" cy="33" r="1.2" fill="white"/>
+    <!-- Planeta con anillo -->
+    <circle cx="46" cy="24" r="8" fill="#FF7043"/>
+    <ellipse cx="46" cy="24" rx="14" ry="4.5" fill="none" stroke="#FFCC80" stroke-width="2.5" transform="rotate(-20 46 24)"/>
+    <!-- Lunita -->
+    <circle cx="13" cy="20" r="5"   fill="#EEEEEE"/>
+    <circle cx="16" cy="18" r="4"   fill="#0D0D2B"/>
+    <!-- Glup flotando asombrado -->
+    <ellipse cx="30" cy="49" rx="17" ry="14" fill="#F9E07A"/>
+    <ellipse cx="30" cy="51" rx="15" ry="12" fill="#FCED8E"/>
+    <ellipse cx="22" cy="37" rx="3"   ry="5.5" fill="#F0D060" transform="rotate(-13 22 37)"/>
+    <ellipse cx="38" cy="37" rx="3"   ry="5.5" fill="#F0D060" transform="rotate(13 38 37)"/>
+    <!-- Ojos grandes (asombrado) -->
+    <circle cx="21" cy="43" r="4.8" fill="white"/><circle cx="30" cy="40" r="4.8" fill="white"/><circle cx="39" cy="43" r="4.8" fill="white"/>
+    <circle cx="21" cy="44" r="2.7" fill="#6B2D90"/><circle cx="30" cy="41" r="2.7" fill="#6B2D90"/><circle cx="39" cy="44" r="2.7" fill="#6B2D90"/>
+    <circle cx="22" cy="43" r="1.1" fill="white"/><circle cx="31" cy="40" r="1.1" fill="white"/><circle cx="40" cy="43" r="1.1" fill="white"/>
+    <!-- Boca en O (asombrado) -->
+    <circle cx="30" cy="55" r="4"   fill="#7A4E00"/>
+    <circle cx="30" cy="55" r="2.5" fill="#3E2000"/>
+    <!-- Pies -->
+    <ellipse cx="22" cy="64" rx="7.5" ry="3.2" fill="#F0D060"/>
+    <ellipse cx="38" cy="64" rx="7.5" ry="3.2" fill="#F0D060"/>
+  </svg>
+</div>
+
+<!-- ========== SOFA ========== -->
+<div class="room-sofa">
+  <svg viewBox="0 0 160 110" width="160" height="110" xmlns="http://www.w3.org/2000/svg">
+    <!-- Sombra -->
+    <ellipse cx="80" cy="108" rx="66" ry="5" fill="rgba(0,0,0,0.13)"/>
+    <!-- Brazos laterales -->
+    <rect x="3"   y="30" width="26" height="68" rx="12" fill="#E8629A"/>
+    <rect x="131" y="30" width="26" height="68" rx="12" fill="#E8629A"/>
+    <!-- Respaldar -->
+    <rect x="18" y="18" width="124" height="55" rx="13" fill="#FF7EB3"/>
+    <rect x="23" y="23" width="114" height="47" rx="11" fill="#FF9DC4"/>
+    <!-- Asiento -->
+    <rect x="18" y="58" width="124" height="36" rx="11" fill="#FFB3D0"/>
+    <rect x="23" y="63" width="114" height="29" rx="9"  fill="#FFCCE0"/>
+    <!-- Línea divisora de cojín -->
+    <line x1="80" y1="63" x2="80" y2="91" stroke="#FFB3D0" stroke-width="2.5" stroke-linecap="round"/>
+    <!-- Patas -->
+    <rect x="28"  y="89" width="12" height="14" rx="5" fill="#C94E82"/>
+    <rect x="120" y="89" width="12" height="14" rx="5" fill="#C94E82"/>
+    <!-- Botones decorativos en respaldar -->
+    <circle cx="54"  cy="43" r="3.2" fill="rgba(255,255,255,0.32)"/>
+    <circle cx="80"  cy="39" r="3.2" fill="rgba(255,255,255,0.32)"/>
+    <circle cx="106" cy="43" r="3.2" fill="rgba(255,255,255,0.32)"/>
+    <!-- Brillo en brazos -->
+    <ellipse cx="16"  cy="38" rx="10" ry="6" fill="rgba(255,255,255,0.15)"/>
+    <ellipse cx="144" cy="38" rx="10" ry="6" fill="rgba(255,255,255,0.15)"/>
+  </svg>
+</div>
+
+<!-- ========== TAPETE ========== -->
+<div class="room-rug">
+  <svg viewBox="0 0 220 55" width="220" height="55" xmlns="http://www.w3.org/2000/svg">
+    <ellipse cx="110" cy="27" rx="108" ry="26" fill="#FF6B9D"/>
+    <ellipse cx="110" cy="27" rx="94"  ry="21" fill="#FF8E53"/>
+    <ellipse cx="110" cy="27" rx="78"  ry="16" fill="#FFCD3C"/>
+    <ellipse cx="110" cy="27" rx="56"  ry="11" fill="rgba(255,142,83,0.45)"/>
+    <!-- Puntitos decorativos -->
+    <circle cx="52"  cy="27" r="4"   fill="rgba(255,255,255,0.4)"/>
+    <circle cx="79"  cy="20" r="3"   fill="rgba(255,255,255,0.4)"/>
+    <circle cx="110" cy="18" r="3.5" fill="rgba(255,255,255,0.4)"/>
+    <circle cx="141" cy="20" r="3"   fill="rgba(255,255,255,0.4)"/>
+    <circle cx="168" cy="27" r="4"   fill="rgba(255,255,255,0.4)"/>
+  </svg>
+</div>
 
 <!-- ========== ZZZ (sleeping) ========== -->
 <div class="zzz" id="zzzEl" style="display:none">💤</div>
@@ -1093,6 +1741,12 @@ const WELCOME_TEXT  = "Heyyy, welcome to Mini Gamers! I'm Glup! What's your name
 function typeWriter(el, text, speed = 48) {
     if (twTimer) { clearInterval(twTimer); twTimer = null; }
     el.textContent = '';
+
+    // Restart pop animation on every new message
+    el.classList.remove('pop');
+    void el.offsetWidth; // force reflow so animation replays
+    el.classList.add('pop');
+
     let i = 0;
     twTimer = setInterval(() => {
         if (i < text.length) {
