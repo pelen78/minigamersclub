@@ -49,7 +49,7 @@ document.addEventListener('click',event=>{const button=event.target.closest('but
  case 'flip':flip(Number(button.dataset.card));break;
  case 'listen':speak(state.question.prompt);break;
  case 'sound':state.sound=!state.sound;stopAudio();if(!state.sound)audioContext?.suspend();else audioContext?.resume();try{localStorage.setItem('mini-playroom-sound',state.sound?'on':'off');}catch{}soundUI();break;
- case 'hello':glup('Hi, friend! Let’s discover something together.','cheer');speak('Hi, friend! Let’s discover something together.');break;
+ case 'hello':glup('Hi, friend! Let’s discover something together.','cheer');recording('glup-welcome','Hi, friend! Let’s discover something together.');break;
  case 'welcome':glup('Pick your level. Let’s have some fun!','cheer');recording('glup-welcome2','Pick your level.');break;
 }});
 document.addEventListener('visibilitychange',()=>{if(document.hidden){stopAudio();audioContext?.suspend();}else if(state.sound)audioContext?.resume();});
