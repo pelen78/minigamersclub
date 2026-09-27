@@ -1,0 +1,63 @@
+/* Classroom composition matching the approved visual direction. */
+:root{--display:'DynaPuff','Fredoka',sans-serif;--ink:#073e49}
+body{background:#c0dccb url('assets/classroom-background.png') center center/cover fixed no-repeat;color:var(--ink)}
+.room-light{display:none}
+body .topbar{position:absolute;inset:12px 0 auto;max-width:none;height:110px;min-height:0;margin:0;padding:0 25px;align-items:flex-start;z-index:5;pointer-events:none}
+.topbar button{pointer-events:auto}
+body .brand{width:clamp(190px,22vw,315px);padding:0;display:block;line-height:0;border:0}
+.brand-image{display:block;width:100%;height:auto}
+body .top-actions{padding-top:10px}
+body .icon-button{width:78px;height:78px;border:5px solid #e1ffec;box-shadow:inset 0 3px 5px #c9fff17a,inset 0 -5px 5px #155c6970,0 5px 0 #386a6145,0 9px 14px #194b4220;background:linear-gradient(135deg,#78ced0,#218b99 60%,#267a85)}
+body .icon-button svg{width:39px;height:39px;stroke-width:2.8}
+body .icon-button[data-muted=true]{background:linear-gradient(135deg,#b4c5c1,#78988f)}
+body .layout{display:grid;grid-template-columns:26% minmax(0,1fr);gap:0;max-width:1730px;min-height:100svh;margin:0 auto;padding:22px 8% 50px 1%}
+body main{padding-top:6px;display:flex;flex-direction:column;align-items:stretch}
+body .glup-panel{position:fixed;top:auto;bottom:10%;left:0;width:28%;max-width:455px;padding:0;display:block;z-index:2}
+body .glup-button{width:100%;margin:0}
+body .glup{width:100%;filter:drop-shadow(0 12px 9px #5543221a)}
+body .glup-button:after{bottom:6%;left:25%;width:52%;height:14px;filter:blur(9px)}
+body .speech{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0;min-height:0}
+body .scene-title{font-family:var(--display);font-weight:700;font-size:clamp(31px,4.1vw,66px);line-height:1.16;letter-spacing:-1.8px;text-align:center;margin:15px 0 34px;position:relative;text-shadow:0 2px 1px #c3e4d260}
+body[data-screen=categories] .scene-title:before,body[data-screen=categories] .scene-title:after{content:'';position:absolute;width:22px;height:12px;top:45%;background:linear-gradient(#ffe996,#ffcb59);border-radius:50%;box-shadow:0 -23px 0 -1px #ffd875;transform:rotate(-25deg);left:-13px}
+body[data-screen=categories] .scene-title:after{left:auto;right:-13px;transform:rotate(25deg)}
+body .crumb{position:fixed;left:28px;bottom:20px;z-index:8;margin:0;min-height:0}
+body .crumb button{background:#fff9e9eb;border:2px solid #fff8;padding:10px 20px;border-radius:23px;font:500 16px var(--display);text-decoration:none;box-shadow:0 3px 0 #78683925;min-height:44px;color:#214f54}
+body .tiles{gap:20px;grid-template-columns:repeat(3,minmax(0,1fr));}
+body .tile{border:2px solid #fff9;border-radius:30px;padding:0;min-height:0;overflow:hidden;background:radial-gradient(ellipse at 50% 25%,#ffffff6e,transparent 65%),var(--tile-color);box-shadow:inset 0 2px 5px #fff8,inset 0 -4px 7px #97845b16,0 5px 3px #6f684123,0 12px 17px #544e3420;transition:transform .2s}
+body .tile:hover{box-shadow:inset 0 2px 5px #fff8,0 7px 4px #6f684124,0 17px 24px #544e3420;transform:translateY(-5px)}
+body .tile:active{transform:translateY(1px)}
+.category-art{background-image:url('assets/category-atlas.png');background-size:300% 200%;clip-path:none}
+body .tile .sprite{width:min(100%,clamp(140px,calc((100svh - 305px)/2),250px));max-width:none;height:auto;aspect-ratio:1;margin:0 auto;transform:scale(1.04);}
+body .tile:hover .sprite{transform:scale(1.07) rotate(-2deg)}
+body .tile .tile-title{display:flex;align-items:center;justify-content:center;margin:0;padding:10px 8px 14px;min-height:62px;border-radius:26px 26px 24px 24px;background:linear-gradient(145deg,#fff9ed,#f7ecd6);border-top:2px solid #fff9;box-shadow:inset 0 -4px 5px #dcc7a71c;font:700 clamp(23px,2.6vw,43px)/1.1 var(--display);letter-spacing:-.9px}
+body .grade-tiles{margin:30px 0 0;align-items:center}
+body .grade-tiles .tile{padding:0;display:block;text-align:center}
+body .grade-tiles .sprite{width:min(100%,280px)}
+body .grade-tiles .tile-title{font-size:clamp(20px,2.4vw,38px);margin:0;min-height:82px;padding:15px 10px}
+body[data-screen=grades] main{justify-content:center;padding-bottom:9vh}
+body[data-screen=grades] .scene-title{margin-bottom:12px}
+body .tile-desc,body .tile-count,body .grade-tag{display:none}
+body .browse-all{margin-top:18px;text-align:right}
+body .pill{background:#fff9e4ee;border-color:#fffb;border-radius:22px;font:500 15px var(--display);padding:10px 19px;box-shadow:0 4px 0 #7e6c3920}
+body[data-screen=games] .tile .sprite{width:min(100%,170px)}
+body[data-screen=games] .tile-title{font-size:21px;min-height:65px;padding:10px}
+body[data-screen=games] .scene-title{margin-top:28px}
+body .play-panel{margin-top:90px;background:#fffaf0f2;border:3px solid #ffffffe0;box-shadow:0 8px 0 #a8986c25,0 12px 30px #4a59421a}
+body .play-header h1{font-family:var(--display);font-weight:600;letter-spacing:-1px}
+body .question{font-family:var(--display);font-weight:500}
+body .memory-art{background-size:300% 200%}
+body[data-screen=win] .play-panel{margin-top:110px}
+body[data-screen=win] h1{font-size:44px}
+@media(min-width:1600px){body .layout{padding-top:35px}body .scene-title{margin-bottom:48px}body .tile .sprite{width:min(100%,300px)}}
+@media(max-width:1050px) and (min-width:761px){body .layout{grid-template-columns:24% minmax(0,1fr);padding-right:9%;padding-left:1%;padding-top:35px}body .brand{width:210px}body .icon-button{width:60px;height:60px;border-width:4px}body .icon-button svg{width:30px;height:30px}body .tiles{gap:14px}body .scene-title{font-size:38px;margin-bottom:30px}body .tile .tile-title{font-size:25px;min-height:57px}body .glup-panel{width:27%;bottom:12%}body .play-panel{padding:22px;margin-top:65px}body .grade-tiles .tile-title{font-size:24px}body .tile .sprite{width:min(100%,200px)}}
+@media(max-width:760px){body{background-position:43% center}body .topbar{position:relative;inset:auto;height:112px;align-items:flex-start;padding:8px 15px}body .brand{width:185px}body .top-actions{padding-top:7px}body .icon-button{width:56px;height:56px;border-width:4px}body .icon-button svg{width:28px;height:28px}body .layout{display:block;padding:0 16px 95px;min-height:calc(100svh - 112px);margin:0}body main{padding-top:0}body .glup-panel{width:105px;left:0;bottom:3px;z-index:4;pointer-events:none}body .glup-button{pointer-events:auto}body .scene-title{font-size:clamp(28px,7.7vw,42px);letter-spacing:-1px;margin:7px 10px 23px;line-height:1.13}body[data-screen=categories] .scene-title:before,body[data-screen=categories] .scene-title:after{width:12px;height:7px;box-shadow:0 -16px 0 -1px #ffd875;left:-14px}body[data-screen=categories] .scene-title:after{left:auto;right:-14px}body .tiles{grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}body .tile{border-radius:23px}body .tile .sprite{width:100%;max-width:220px}body .tile .tile-title{border-radius:20px;min-height:51px;font-size:clamp(20px,5.5vw,28px);padding:9px 5px 12px;letter-spacing:-.7px}body .grade-tiles{display:grid;grid-template-columns:1fr;max-width:510px;width:100%;margin:6px auto 0;gap:14px}body .grade-tiles .tile{display:flex;align-items:center;text-align:left}body .grade-tiles .sprite{width:120px;margin:0 8px;flex-shrink:0}body .grade-tiles .tile-title{font-size:clamp(23px,6vw,32px);background:none;border:none;box-shadow:none;flex:1;min-height:80px;padding:12px 7px;margin:0;justify-content:flex-start}body[data-screen=grades] main{padding-bottom:0;justify-content:flex-start}body .crumb{left:auto;right:16px;bottom:15px}body .crumb button{font-size:14px;padding:10px 16px}body .browse-all{margin:20px 0 0;text-align:center}body .play-panel{margin-top:0;padding:20px 14px}body[data-screen=games] .scene-title{margin-top:7px}body[data-screen=games] .tile .sprite{width:100%}body[data-screen=games] .tile-title{font-size:19px;min-height:60px}body .play-header h1{font-size:23px}body .question{font-size:22px}body .glup-panel.playing .glup-button{width:100%}body[data-screen=play] .glup-panel{width:80px}body[data-screen=win] .play-panel{margin-top:12px}body[data-screen=win] h1{font-size:34px}}
+@media(max-width:360px){body .topbar{height:102px}body .brand{width:165px}body .layout{padding-left:11px;padding-right:11px}body .tiles{gap:10px}body .tile .tile-title{font-size:21px;min-height:48px}body .grade-tiles .sprite{width:99px;margin:0 4px}body .grade-tiles .tile-title{font-size:23px}body .play-panel{padding:18px 10px}}
+@media(prefers-reduced-motion:reduce){body .tile:hover .sprite{transform:none}}
+@media(min-width:761px){body main{grid-column:2}}
+body .scene-title{align-self:center;width:fit-content;max-width:100%;padding:0 15px}
+body .category-tiles .tile{padding:0}
+body .category-tiles .sprite{width:min(100%,clamp(160px,calc((100svh - 390px)/2),280px));clip-path:inset(1.8%)}
+body .category-tiles .tile-title{font:700 clamp(23px,2.7vw,44px)/1.1 var(--display);margin:0;border-radius:26px;min-height:70px;position:relative}
+@media(max-width:760px){body .scene-title{padding:0 5px}body .category-tiles .sprite{width:100%}body .category-tiles .tile-title{font-size:clamp(20px,5.5vw,28px);min-height:52px;border-radius:20px}}
+@media(max-width:760px){body .glup-panel,body[data-screen=play] .glup-panel{position:absolute;top:17px;bottom:auto;left:auto;right:80px;width:65px;z-index:4}}
+@media(max-width:360px){body .glup-panel,body[data-screen=play] .glup-panel{width:55px;right:77px;top:20px}}
