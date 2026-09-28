@@ -47,11 +47,9 @@ function prekShape(){
   const others=shuffle(prekShapes.filter(v=>v!==s)).slice(0,3),tints=shuffle(prekColors);
   return q(`Find the ${s}.`,'',[s,...others].map((v,i)=>choice(cap(v),v,shape(v,tints[i][1]))),s);
  }
- const target=`${c[0]}-${s}`,opts=[[c,s]],used=new Set([target]);
- const add=(col,sh)=>{const k=`${col[0]}-${sh}`;if(!used.has(k)&&opts.length<4){used.add(k);opts.push([col,sh]);}};
- add(pick(prekColors.filter(v=>v!==c)),s);
- add(c,pick(prekShapes.filter(v=>v!==s)));
- while(opts.length<4)add(pick(prekColors),pick(prekShapes));
+ /* Every option gets its own color; one distractor is the same shape in another color. */
+ const tints=shuffle(prekColors.filter(v=>v!==c)).slice(0,3),others=shuffle(prekShapes.filter(v=>v!==s));
+ const opts=[[c,s],[tints[0],s],[tints[1],others[0]],[tints[2],others[1]]],target=`${c[0]}-${s}`;
  return q(`Find the ${c[0].toLowerCase()} ${s}.`,'',opts.map(([col,sh])=>item(col,sh)),target);
 }
 function generate(grade,kind){
