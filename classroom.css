@@ -90,3 +90,24 @@ body .top-actions .icon-button svg{width:32px;height:32px}
 .music-slash{display:none;stroke-width:3}
 .music-button[data-muted=true] .music-slash{display:block}
 @media(max-width:760px){body .top-actions{right:12px;top:15px;gap:8px}body .top-actions .icon-button{width:48px;height:48px}body .top-actions .icon-button svg{width:25px;height:25px}}
+
+/* The same compact menu treatment for levels and every game's library. */
+body:is([data-screen=grades],[data-screen=games]) .scene-title{align-self:stretch;width:100%;max-width:none;text-align:left;font-size:clamp(23px,2.3vw,31px);line-height:1.25;letter-spacing:-.5px;margin:0 0 16px;padding:12px 19px;background:#d6eddf;border:2px solid #fff5;border-bottom:4px solid #a0c9b3;border-radius:14px;box-shadow:0 3px 10px #294d3c12;text-shadow:none}
+body[data-screen=games] main{padding-top:50px}
+body .grade-tiles{margin:0;gap:14px}
+body .grade-tiles .tile{border-radius:21px}
+body .grade-tiles .sprite{width:min(100%,155px)}
+body .grade-tiles .tile-title{font-size:clamp(20px,2vw,27px);min-height:56px;padding:10px 8px;border-radius:18px;letter-spacing:-.6px}
+body[data-screen=games] .tiles{gap:14px}
+body[data-screen=games] .tile{border-radius:21px}
+body[data-screen=games] .tile .sprite{width:min(100%,112px)}
+body[data-screen=games] .tile-title{font-size:19px;min-height:53px;padding:9px 8px;border-radius:18px;letter-spacing:-.4px}
+@media(max-width:760px){
+ body:is([data-screen=grades],[data-screen=games]) .scene-title{font-size:23px;padding:10px 14px;margin:0 0 14px}
+ body[data-screen=games] main{padding-top:0}
+ body .grade-tiles{gap:12px}
+ body .grade-tiles .sprite{width:86px;margin:0 7px}
+ body .grade-tiles .tile-title{font-size:23px;min-height:68px;padding:10px 8px}
+ body[data-screen=games] .tile .sprite{width:min(100%,100px)}
+ body[data-screen=games] .tile-title{font-size:18px;min-height:54px;padding:9px 6px}
+}
