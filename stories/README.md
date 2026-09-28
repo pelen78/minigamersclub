@@ -20,3 +20,11 @@ Verified locally: all nine scenes, counts 1–5, leaf selection, three stars, bu
 Planting supports pointer dragging (mouse or touch) into a forgiving pot target, plus a tap/keyboard alternative. Other seed tasks use taps. A missed drop returns the seed without completing the page. The first book's data and artwork remain unchanged.
 
 Verified: both full nine-page story flows; seed drag into the pot; tap planting at 320px; next-page gates; separate book selection; first story's butterfly ending; no horizontal overflow on mobile. Audio remains unimplemented for both books.
+
+## Read-Along Stories: Glup and the Moonlight Wish
+
+The home library now separates the two interactive books under **Play-Along Stories** from narrated picture books under **Read-Along Stories**. `moonlight.js` defines the nine scenes, non-interactive illustration adapter and a separate read-along controller. Each record has `audioNarration: null`; no synthetic voice or final recording is added. When a recording path is supplied, the narration button can replay it; page changes and exit stop it.
+
+Read-along pages have no task state, targets, counters or completion gates. Next and Back turn pages freely; the ending offers Read Again and Back to Stories. Returning focuses the corresponding library section. `moonlight.css` supplies moonlight, forest, lake, hill, firefly and star movements with a reduced-motion fallback. Glup uses the existing atlas unchanged.
+
+Verified: all nine pages on desktop and at 320px, back, restart, return to the right shelf, disabled narration placeholders, no horizontal overflow, silent story audio, and both existing book entry points plus Munchy Bug's first interaction gate.
