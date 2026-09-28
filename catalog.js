@@ -16,6 +16,7 @@ const entries={
 };
 const games=Object.fromEntries(Object.entries(entries).map(([grade,items])=>[grade,items.map(([kind,name,desc,category])=>({id:kind,kind,name,desc,category,art:categories.find(c=>c.id===category).art}))]));
 const colors=[['Red','#eb5859'],['Blue','#489edd'],['Yellow','#f4c84f'],['Green','#67b67f'],['Orange','#f39853'],['Purple','#ae88cc']];
+const matchColors=[...colors.slice(0,5),['Black','#34363d'],['White','#fffdf8']];
 const shapes=['circle','square','triangle','star'];
 const rnd=(a,b)=>Math.floor(Math.random()*(b-a+1))+a;
 const pick=a=>a[rnd(0,a.length-1)];
@@ -24,7 +25,7 @@ const cap=s=>s[0].toUpperCase()+s.slice(1);
 const animalNames=['Dog','Cat','Cow','Duck','Dolphin','Bird','Bee','Fish','Butterfly'];
 function animalChoice(name){const i=animalNames.indexOf(name);return choice(name,name,i<0?'':`<span class="sprite animal-art" style="--x:${i%3*50}%;--y:${Math.floor(i/3)*50}%" aria-hidden="true"></span>`);}
 const shape=(s,color='#55b7bd',size=64)=>`<span class="shape ${s}" style="--shape-color:${color};--shape-size:${size}px" aria-hidden="true"></span>`;
-const blob=(color,size=66)=>`<span class="paint-dot" style="--paint:${color};--dot-size:${size}px" aria-hidden="true"></span>`;
+const blob=(color,size=66)=>`<span class="paint-dot${color==='#fffdf8'?' paint-white':''}" style="--paint:${color};--dot-size:${size}px" aria-hidden="true"></span>`;
 const face=(feeling)=>`<span class="face ${feeling}" aria-hidden="true"><i></i><i></i><b></b></span>`;
 function choice(label,key=label,visual=''){return {label,key,visual};}
 function q(prompt,visual,options,answer){return{prompt,visual,options:shuffle(options),answer};}
@@ -34,7 +35,7 @@ function generate(grade,kind){
  const difficulty={prek:0,kinder:1,grade1:2}[grade];
  if(difficulty===undefined)throw new Error('Unknown grade');
  if(kind==='colors'){
-  const opts=shuffle(colors.slice(0,difficulty?6:4)).slice(0,4),c=pick(opts);
+  const opts=shuffle(difficulty?colors:matchColors).slice(0,4),c=pick(opts);
   return q(`Find ${c[0].toLowerCase()}.`,'<span class="question-symbol">?</span>',opts.map(v=>choice(v[0],v[0],blob(v[1]))),c[0]);
  }
  if(kind==='mix'){
