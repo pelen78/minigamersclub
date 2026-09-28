@@ -16,7 +16,7 @@ const entries={
 };
 const games=Object.fromEntries(Object.entries(entries).map(([grade,items])=>[grade,items.map(([kind,name,desc,category])=>({id:kind,kind,name,desc,category,art:categories.find(c=>c.id===category).art}))]));
 const colors=[['Red','#eb5859'],['Blue','#489edd'],['Yellow','#f4c84f'],['Green','#67b67f'],['Orange','#f39853'],['Purple','#ae88cc']];
-const matchColors=[...colors.slice(0,5),['Black','#34363d'],['White','#fffdf8']];
+const matchColors=[...colors,['Pink','#f497b6'],['Brown','#9a6a43'],['Black','#34363d'],['White','#fffdf8']];
 const shapes=['circle','square','triangle','star'];
 const rnd=(a,b)=>Math.floor(Math.random()*(b-a+1))+a;
 const pick=a=>a[rnd(0,a.length-1)];
