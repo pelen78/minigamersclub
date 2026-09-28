@@ -33,3 +33,56 @@
 .narration-button{display:inline-flex;align-items:center;gap:8px;min-height:50px;margin-top:14px;padding:8px 20px;border:2px solid #dfddcb;border-radius:18px;background:#edf0e4;color:#466c6d;font:600 16px var(--body);cursor:pointer}.narration-button span{font-size:22px;line-height:1}.narration-start{min-height:58px;padding:10px 28px;border-color:#fff8e8;background:#4b8e89;color:#fff;font-size:19px;box-shadow:0 6px 16px rgba(75,142,137,.3)}
 .read-word{border-radius:7px;padding:1px 3px;margin:0 -3px;-webkit-box-decoration-break:clone;box-decoration-break:clone;transition:background-color .12s ease,color .12s ease}.read-word.reading{background:#ffe38a;color:#2d4944}
 @media(prefers-reduced-motion:reduce){.read-word{transition:none}}
+
+/* Fixed reading view. The illustration uses the space left between the controls
+   and narration, rather than adding a fixed image height to the whole page. */
+body[data-screen=story]:has(.readalong-book){overflow:hidden;overscroll-behavior:none}
+body[data-screen=story]:has(.readalong-book) .topbar{display:none}
+body[data-screen=story]:has(.readalong-book) .layout{position:fixed;inset:0;width:100%;height:100dvh;min-height:0;max-width:none;margin:0;padding:0;display:block;z-index:10;background:#fff9ec}
+body[data-screen=story]:has(.readalong-book) main{height:100%;min-height:0;padding:0}
+.readalong-book{height:100%;display:grid;grid-template-rows:auto minmax(0,1fr) auto;border:0;border-radius:0;box-shadow:none}
+.readalong-book .story-toolbar{padding:calc(8px + env(safe-area-inset-top)) max(18px,env(safe-area-inset-right)) 8px max(18px,env(safe-area-inset-left));gap:14px;min-height:64px}
+.readalong-book .story-book-name{max-width:none;font-size:clamp(12px,1.5vw,18px);margin-left:auto}
+.readalong-book .book-home{min-height:46px}
+.readalong-page{display:grid;grid-template-rows:minmax(0,1fr) auto;min-height:0;overflow:hidden}
+.readalong-book .moon-scene{height:auto;min-height:0;container-type:size}
+.readalong-book .moon-scene .moon-glup{width:min(32cqw,82cqh,360px)}
+.readalong-book .moon-scene .moon-disc{width:min(11cqw,25cqh,110px)}
+.readalong-book .moon-scene .moon-little-star{width:min(10cqw,22cqh,100px)}
+.readalong-book .moon-goodnight .moon-little-star{width:min(8cqw,18cqh,65px)}
+.readalong-book .readalong-copy{min-height:0;padding:12px 24px 14px;overflow-y:auto;overscroll-behavior:contain}
+.readalong-book .readalong-copy h1{font-size:clamp(22px,2.5vw,30px);margin-bottom:7px}
+.readalong-book .readalong-copy p{font-size:clamp(17px,1.7vw,21px);line-height:1.45;max-width:850px}
+.readalong-book .narration-button{min-height:44px;margin-top:10px;padding:5px 20px;box-shadow:none;font-size:16px}
+.readalong-book .book-pager{min-height:72px;padding:8px max(18px,env(safe-area-inset-right)) calc(8px + env(safe-area-inset-bottom)) max(18px,env(safe-area-inset-left));flex-wrap:nowrap;gap:12px}
+.readalong-book .page-arrow{width:58px;height:52px;font-size:46px;flex-shrink:0}
+.readalong-book .readalong-ending{width:auto;gap:8px}
+.readalong-book .book-pager:has(.readalong-ending){flex-wrap:nowrap}
+.readalong-book .book-pager:has(.readalong-ending)>.story-page-number{flex:1;text-align:center}
+@media(max-width:760px){
+ .readalong-book .story-toolbar{padding-left:max(12px,env(safe-area-inset-left));padding-right:max(12px,env(safe-area-inset-right));min-height:62px}
+ .readalong-book .story-book-name{max-width:230px;line-height:1.4}
+ .readalong-book .moon-scene .moon-glup{width:min(65cqw,82cqh,220px)}
+ .readalong-book .moon-scene .moon-disc{width:min(23cqw,25cqh,85px)}
+ .readalong-book .moon-scene .moon-little-star{width:min(23cqw,23cqh,78px)}
+ .readalong-book .moon-goodnight .moon-little-star{width:min(18cqw,18cqh,55px)}
+ .readalong-book .readalong-copy{padding:10px 16px 12px}
+ .readalong-book .readalong-copy h1{font-size:22px;margin-bottom:7px}
+ .readalong-book .readalong-copy p{font-size:17px;line-height:1.4}
+ .readalong-book .book-pager{padding-left:max(12px,env(safe-area-inset-left));padding-right:max(12px,env(safe-area-inset-right));gap:8px}
+ .readalong-book .readalong-ending .book-home span{display:none}
+ .readalong-book .readalong-again{min-height:46px;font-size:13px;padding:5px 10px}
+ .readalong-book .readalong-ending .book-home{min-width:44px;padding:5px 9px}
+}
+/* A sideways phone reads like a two-page book and keeps both controls in view. */
+@media(max-height:500px) and (min-width:600px){
+ .readalong-page{grid-template-columns:55% 45%;grid-template-rows:minmax(0,1fr)}
+ .readalong-book .readalong-copy{display:flex;flex-direction:column;align-items:center;justify-content:safe center;padding:12px 20px}
+ .readalong-book .readalong-copy h1{font-size:22px}
+ .readalong-book .readalong-copy p{font-size:17px}
+ .readalong-book .moon-scene .moon-glup{width:min(60cqw,80cqh,260px)}
+ .readalong-book .moon-scene .moon-disc{width:min(20cqw,25cqh,85px)}
+ .readalong-book .moon-scene .moon-little-star{width:min(19cqw,22cqh,78px)}
+ .readalong-book .story-toolbar{min-height:54px;padding-top:calc(4px + env(safe-area-inset-top));padding-bottom:4px}
+ .readalong-book .book-pager{min-height:64px;padding-top:5px;padding-bottom:calc(5px + env(safe-area-inset-bottom))}
+}
