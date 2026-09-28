@@ -12,3 +12,11 @@ Food interactions use taps/clicks, not dragging. Each food can only count once. 
 To edit the story, change scene content or item lists in `munchy-bug.js`. Artwork can be replaced in `art.js` without changing the interaction buttons. Audio paths are placeholders only; filling them later requires connecting real recordings to a narration control.
 
 Verified locally: all nine scenes, counts 1–5, leaf selection, three stars, butterfly reveal, previous-page progress, replay reset, home navigation, silent story mode, and 390px/320px mobile layout.
+
+## Second book: Glup and the Little Seed
+
+`little-seed.js` contains the nine scene records, future audio placeholders and a small visual adapter. `seed-art.js` contains the seed, pot, growing plant, watering can, rain, colored flowers and garden visitors. `player.js` registers both books and shares progress, next/previous, replay and home logic between them. Library buttons select a book by `data-story`.
+
+Planting supports pointer dragging (mouse or touch) into a forgiving pot target, plus a tap/keyboard alternative. Other seed tasks use taps. A missed drop returns the seed without completing the page. The first book's data and artwork remain unchanged.
+
+Verified: both full nine-page story flows; seed drag into the pot; tap planting at 320px; next-page gates; separate book selection; first story's butterfly ending; no horizontal overflow on mobile. Audio remains unimplemented for both books.
