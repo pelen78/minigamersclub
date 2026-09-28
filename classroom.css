@@ -81,3 +81,12 @@ body[data-screen=grades]:not(.glup-greeted) .glup-invite{display:flex;flex-direc
  .glup-invite .glup-invite-arrow{position:static;width:86px;height:76px;transform:translateY(-16px) rotate(110deg);margin:0 0 0 4px}
 }
 @media(prefers-reduced-motion:reduce){body[data-screen=grades]:not(.glup-greeted) .glup-invite{animation:none}}
+
+/* Persistent, independent controls for voice and quiet background music. */
+body .top-actions{position:fixed;right:18px;top:20px;padding:0;display:flex;flex-direction:column;gap:12px;z-index:10}
+body .top-actions .icon-button{width:64px;height:64px;border-width:4px;flex-shrink:0}
+body .top-actions .icon-button svg{width:32px;height:32px}
+.music-button{order:2}
+.music-slash{display:none;stroke-width:3}
+.music-button[data-muted=true] .music-slash{display:block}
+@media(max-width:760px){body .top-actions{right:12px;top:15px;gap:8px}body .top-actions .icon-button{width:48px;height:48px}body .top-actions .icon-button svg{width:25px;height:25px}}

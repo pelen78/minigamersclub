@@ -4,6 +4,24 @@ const $=s=>document.querySelector(s);
 const state={screen:'grades',grade:null,category:null,game:null,round:0,question:null,locked:false,sound:true,matched:[],flipped:[],deck:[],session:0,completed:{}};
 try{state.completed=JSON.parse(localStorage.getItem('mini-playroom-completed')||'{}')||{};state.sound=localStorage.getItem('mini-playroom-sound')!=='off';}catch{}
 let voice=null,audioContext=null,timers=new Set();
+// Music has its own mute preference and gain, independent from Glup and effects.
+const backgroundMusic=$('#background-music');
+let musicEnabled=true,musicStarted=false,musicContext=null,musicGain=null;
+try{musicEnabled=localStorage.getItem('mini-playroom-music')!=='off';}catch{}
+backgroundMusic.volume=.1;
+function musicUI(){const b=$('#music-button');b.dataset.muted=String(!musicEnabled);b.setAttribute('aria-pressed',String(musicEnabled));b.setAttribute('aria-label',musicEnabled?'Mute music':'Play music');}
+function startMusic(){
+ if(!musicEnabled||document.hidden||!musicStarted)return;
+ // A separate gain also keeps music quiet on mobile browsers that ignore media volume.
+ if(!musicContext){try{const Context=window.AudioContext||window.webkitAudioContext;if(Context){musicContext=new Context();musicGain=musicContext.createGain();musicGain.gain.value=.1;musicContext.createMediaElementSource(backgroundMusic).connect(musicGain);musicGain.connect(musicContext.destination);backgroundMusic.volume=1;}}catch{musicContext=null;backgroundMusic.volume=.1;}}
+ musicContext?.resume().catch(()=>{});
+ backgroundMusic.play().catch(()=>{});
+}
+function toggleMusic(){musicEnabled=!musicEnabled;try{localStorage.setItem('mini-playroom-music',musicEnabled?'on':'off');}catch{}musicUI();if(musicEnabled)startMusic();else{backgroundMusic.pause();musicContext?.suspend().catch(()=>{});}}
+// Start only after a real interaction; never compete with browser autoplay rules.
+document.addEventListener('click',event=>{musicStarted=true;if(event.target.closest('[data-action="music"]'))return;startMusic();});
+window.addEventListener('pagehide',()=>{backgroundMusic.pause();musicContext?.suspend().catch(()=>{});});
+window.addEventListener('pageshow',()=>{startMusic();});
 const total=6;
 const speaker='<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9h4l5-4v14l-5-4H4zM17 8q5 4 0 8"/></svg>';
 const escapeHtml=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
@@ -48,9 +66,10 @@ document.addEventListener('click',event=>{const button=event.target.closest('but
  case 'answer':answer(Number(button.dataset.option),button);break;
  case 'flip':flip(Number(button.dataset.card));break;
  case 'listen':speak(state.question.prompt);break;
+ case 'music':toggleMusic();break;
  case 'sound':state.sound=!state.sound;stopAudio();if(!state.sound)audioContext?.suspend();else audioContext?.resume();try{localStorage.setItem('mini-playroom-sound',state.sound?'on':'off');}catch{}soundUI();break;
  case 'hello':if(state.sound)document.body.classList.add('glup-greeted');glup('Hi, friend! Let’s discover something together.','cheer');recording('glup-welcome','Hi, friend! Let’s discover something together.');break;
  case 'welcome':glup('Pick your level. Let’s have some fun!','cheer');recording('glup-welcome2','Pick your level.');break;
 }});
-document.addEventListener('visibilitychange',()=>{if(document.hidden){stopAudio();audioContext?.suspend();}else if(state.sound)audioContext?.resume();});
-soundUI();showGrades();
+document.addEventListener('visibilitychange',()=>{if(document.hidden){stopAudio();audioContext?.suspend();backgroundMusic.pause();musicContext?.suspend().catch(()=>{});}else{if(state.sound)audioContext?.resume();startMusic();}});
+soundUI();musicUI();showGrades();
