@@ -37,9 +37,9 @@ function glup(message,pose='idle'){const g=$('#glup');$('#glup-message').textCon
 function focusMain(){document.body.dataset.screen=state.screen;requestAnimationFrame(()=>{$('#main').focus({preventScroll:true});window.scrollTo({top:0,behavior:'instant'});});}
 function crumb(){return `<nav class="crumb" aria-label="Back"><button data-action="${state.screen==='games'?'home':'games'}">‹ ${state.screen==='games'?'Levels':'Games'}</button></nav>`;}
 function heading(eyebrow,title,sub){return `<h1 class="scene-title">${title}</h1>`;}
-function showGrades(announce=false){leave();state.screen='grades';state.grade=null;state.category=null;state.game=null;$('.glup-panel').classList.remove('playing');glup("Hi! I'm Glup. Which level shall we explore?");
+function showGrades(){leave();state.screen='grades';state.grade=null;state.category=null;state.game=null;$('.glup-panel').classList.remove('playing');glup("Hi! I'm Glup. Which level shall we explore?");
  $('#main').innerHTML=heading('A little play. A big discovery.','Choose your level','Choose a level. There’s something wonderful to discover in each one.')+`<div class="tiles grade-tiles">${C.grades.map(g=>`<button class="tile ${g.color}" data-action="grade" data-grade="${g.id}">${sprite(g.art)}<span class="tile-title">${g.name}</span></button>`).join('')}</div>`;
- if(announce)speak('Choose your level.');focusMain();}
+ focusMain();}
 function showGames(){leave();state.screen='games';state.category='all';$('.glup-panel').classList.remove('playing');const list=C.games[state.grade];const name=C.grades.find(g=>g.id===state.grade).name;glup('Pick a game. I’ll be right here with you!');
  $('#main').innerHTML=crumb()+heading(C.grades.find(g=>g.id===state.grade).name,name,'Choose an activity. You can come back and try another any time.')+`<div class="tiles">${list.map(g=>{const cat=C.categories.find(c=>c.id===g.category);return `<button class="tile game-tile ${cat.color}" data-action="start" data-game="${g.id}">${state.completed[state.grade+':'+g.id]?'<span class="check-mark" aria-label="Played">✓</span>':''}${sprite(g.art)}<span class="tile-title">${g.name}</span></button>`;}).join('')}</div>`;
  recording('glup-selectgame','Pick a game.');focusMain();}
@@ -59,7 +59,7 @@ function flip(index){if(state.locked||state.flipped.includes(index)||state.match
 function confetti(){if(matchMedia('(prefers-reduced-motion: reduce)').matches)return;for(let i=0;i<22;i++){const e=document.createElement('span');e.className='confetti';e.style.cssText=`--left:${Math.random()*100}%;--delay:${Math.random()*.4}s;--confetti:${C.colors[i%6][1]}`;$('#celebration').append(e);setTimeout(()=>e.remove(),2200);}}
 function win(){stopAudio();state.screen='win';state.locked=true;state.completed[state.grade+':'+state.game.id]=true;try{localStorage.setItem('mini-playroom-completed',JSON.stringify(state.completed));}catch{}glup('Look what you discovered! I’m proud of you.','cheer');$('#main').innerHTML=crumb()+`<section class="play-panel"><div class="win-star" aria-hidden="true">★</div><h1>You did it!</h1><p class="win-copy">${state.game.name} complete.</p><p class="subtitle">A little practice makes a big difference.</p><div class="play-actions"><button class="primary" data-action="start" data-game="${state.game.id}">Play again</button><button class="secondary" data-action="games" data-category="${state.category||'all'}">More games →</button></div></section>`;confetti();speak('You did it! Great exploring!');focusMain();}
 document.addEventListener('click',event=>{const button=event.target.closest('button[data-action]');if(!button||button.disabled)return;switch(button.dataset.action){
- case 'home':showGrades(true);break;
+ case 'home':showGrades();break;
  case 'grade':state.grade=button.dataset.grade;showGames();break;
  case 'games':showGames();break;
  case 'start':play(button.dataset.game);break;
