@@ -1,4 +1,6 @@
 'use strict';
+/* Word timings [start,end] in seconds, generated from each narration recording. */
+const moonlightWordTimes=[[[0.0,0.22],[0.22,0.52],[0.52,1.04],[1.68,1.82],[1.82,2.12],[2.12,2.22],[2.22,2.52],[2.52,2.88],[2.88,3.2],[3.2,3.58],[3.58,3.68],[3.68,3.96]],[[0.0,0.26],[0.8,1.28],[1.28,1.42],[1.42,1.54],[1.54,1.78],[1.78,2.12],[3.42,3.46],[3.46,3.58],[3.58,3.72],[3.72,4.2],[4.2,4.62],[4.62,4.94],[4.94,5.22]],[[0.0,0.32],[0.32,0.66],[0.66,0.9],[0.9,1.08],[2.3,2.3],[2.64,2.82],[2.82,3.1],[3.1,3.46],[3.46,3.62],[3.62,3.98],[3.98,4.38]],[[0.0,0.18],[0.18,0.44],[0.44,1.16],[1.16,1.4],[1.4,1.78],[1.78,2.38],[2.38,2.68],[2.68,2.98],[2.98,3.18],[3.18,3.56],[3.56,3.94]],[[0.0,0.18],[0.18,0.38],[0.38,1.08],[1.08,1.26],[1.26,1.38],[1.38,1.66],[1.66,2.02],[2.02,2.16],[2.16,2.4],[2.4,2.8]],[[0.0,0.2],[0.46,0.54],[0.74,0.96],[0.96,1.16],[1.16,1.5],[1.5,2.02],[2.02,2.2],[2.2,2.44],[2.44,2.88],[2.88,3.36],[3.36,3.72]],[[0.0,0.14],[0.14,0.3],[0.3,0.6],[0.6,1.08],[1.68,1.82],[1.82,1.94],[1.94,2.12],[2.12,2.42],[2.42,2.8],[2.8,3.0],[3.0,3.24],[3.24,3.68],[3.68,4.02],[4.02,4.34]],[[0.0,0.28],[0.64,0.94],[0.94,1.28],[1.28,1.64],[1.64,2.34],[2.84,2.96],[2.96,3.18],[3.18,3.6],[3.6,4.14],[4.14,4.54],[4.54,4.8]],[[0.0,0.24],[0.24,0.48],[0.48,0.78],[2.08,2.1],[2.1,2.32],[2.32,2.58],[2.58,2.88],[2.88,3.18],[3.64,4.12],[4.12,4.46],[4.46,4.8],[4.8,5.62],[5.62,5.84],[5.84,6.12],[6.12,6.72],[6.72,7.02],[7.02,7.24]]];
 window.MoonlightStory={
  id:'glup-moonlight-wish',title:'Glup and the Moonlight Wish',format:'read-along',theme:'moonlight',
  scenes:[
@@ -11,7 +13,7 @@ window.MoonlightStory={
   {id:'moon',title:'The Moon Helps',text:'The moon smiled down, and the little star began to shine brighter than ever.',description:'A smiling moon shines on Glup and the little star, which glows with warm golden light.'},
   {id:'home',title:'Back Home',text:'Then, with one bright sparkle, the little star floated back home.',description:'Glup watches the little star float up from the hill into the sky.'},
   {id:'goodnight',title:'Goodnight, Little Star',text:'Glup waved goodbye. And every night after that, one little star seemed to shine just for him.',description:'Glup rests on the hill looking up at his little star shining beside the moon.'}
- ].map((scene,i)=>({...scene,audioNarration:encodeURI(`audio/read aloud moonlight wish/${i+1}.mp3`)}))
+ ].map((scene,i)=>({...scene,audioNarration:encodeURI(`audio/read aloud moonlight wish/${i+1}.mp3`),wordTimes:moonlightWordTimes[i]}))
 };
 
 /* Non-interactive illustrations: the existing Glup sprite stays unchanged. */
@@ -24,16 +26,19 @@ window.MoonlightArt=(()=>{
 })();
 
 window.ReadAlongPlayer=(()=>{
- let root=null,book=null,page=0,onHome=null,events=null,narration=null,started=false;
+ let root=null,book=null,page=0,onHome=null,events=null,narration=null,started=false,wordFrame=0;
  const speaker='<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9h4l5-4v14l-5-4H4zM17 8q5 4 0 8M20 5q7 7 0 14"/></svg>';
- function stopNarration(){if(narration){narration.pause();narration=null;}}
- function playNarration(){const src=book.scenes[page].audioNarration;if(!src)return;stopNarration();narration=new Audio(src);narration.play().catch(()=>{});}
+ function stopNarration(){cancelAnimationFrame(wordFrame);if(narration){narration.pause();narration=null;}highlight(-1);}
+ function highlight(index){root?.querySelectorAll('.read-word').forEach((word,i)=>word.classList.toggle('reading',i===index));}
+ function followWords(audio,times){const tick=()=>{if(audio!==narration)return;const now=audio.currentTime;let index=-1;for(let i=0;i<times.length;i++){if(times[i][0]<=now)index=i;else break;}if(index>=0&&now>times[index][1]+.3)index=-1;highlight(audio.ended?-1:index);if(!audio.ended)wordFrame=requestAnimationFrame(tick);};wordFrame=requestAnimationFrame(tick);}
+ function words(scene){const list=scene.text.split(' ');if(!scene.wordTimes||scene.wordTimes.length!==list.length)return scene.text;return list.map(word=>`<span class="read-word">${word}</span>`).join(' ');}
+ function playNarration(){const src=book.scenes[page].audioNarration;if(!src)return;stopNarration();narration=new Audio(src);const times=book.scenes[page].wordTimes;if(times)followWords(narration,times);narration.play().catch(()=>{});}
  function narrationButton(){return started?'<button class="narration-button" data-read-action="narration"><span aria-hidden="true">↻</span> Repeat</button>':'<button class="narration-button narration-start" data-read-action="start"><span aria-hidden="true">▶</span> Start</button>';}
  function soundOn(){try{return localStorage.getItem('mini-playroom-sound')!=='off';}catch{return true;}}
  function close(){stopNarration();events?.abort();events=null;root=null;}
  function open(element,home,entry){close();root=element;onHome=home;book=entry;page=0;started=false;events=new AbortController();root.addEventListener('click',handle,{signal:events.signal});render();}
  function render(){stopNarration();if(page>0)started=true;const scene=book.scenes[page],last=page===book.scenes.length-1;
-  root.innerHTML=`<article class="storybook readalong-book" aria-labelledby="readalong-title"><nav class="story-toolbar" aria-label="Story controls"><button class="book-home" data-read-action="home" aria-label="Back to Stories">⌂<span>Stories</span></button><span class="story-book-name">${book.title}</span></nav><div class="readalong-page page-arrival">${window.MoonlightArt.scene(scene)}<div class="readalong-copy"><h1 id="readalong-title">${scene.title}</h1><p>${scene.text}</p>${scene.audioNarration?narrationButton():''}</div></div><nav class="book-pager" aria-label="Book pages"><button class="page-arrow" data-read-action="back" aria-label="Back" ${page===0?'disabled':''}>‹</button><span class="story-page-number" aria-live="polite">${page+1} / ${book.scenes.length}</span>${last?'<div class="readalong-ending"><button class="readalong-again" data-read-action="restart"><span aria-hidden="true">↻</span> Read Again</button><button class="book-home" data-read-action="home" aria-label="Back to Stories">⌂<span>Back to Stories</span></button></div>':'<button class="page-arrow" data-read-action="next" aria-label="Next">›</button>'}</nav></article>`;
+  root.innerHTML=`<article class="storybook readalong-book" aria-labelledby="readalong-title"><nav class="story-toolbar" aria-label="Story controls"><button class="book-home" data-read-action="home" aria-label="Back to Stories">⌂<span>Stories</span></button><span class="story-book-name">${book.title}</span></nav><div class="readalong-page page-arrival">${window.MoonlightArt.scene(scene)}<div class="readalong-copy"><h1 id="readalong-title">${scene.title}</h1><p>${words(scene)}</p>${scene.audioNarration?narrationButton():''}</div></div><nav class="book-pager" aria-label="Book pages"><button class="page-arrow" data-read-action="back" aria-label="Back" ${page===0?'disabled':''}>‹</button><span class="story-page-number" aria-live="polite">${page+1} / ${book.scenes.length}</span>${last?'<div class="readalong-ending"><button class="readalong-again" data-read-action="restart"><span aria-hidden="true">↻</span> Read Again</button><button class="book-home" data-read-action="home" aria-label="Back to Stories">⌂<span>Back to Stories</span></button></div>':'<button class="page-arrow" data-read-action="next" aria-label="Next">›</button>'}</nav></article>`;
   root.querySelector('h1').setAttribute('tabindex','-1');root.querySelector('h1').focus({preventScroll:true});window.scrollTo({top:0,behavior:'instant'});
   if(started&&soundOn())playNarration();
  }
