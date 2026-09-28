@@ -10,7 +10,7 @@ const grades=[{id:'prek',name:'Pre-K',tag:'Little discoveries',desc:'Match, noti
  {id:'kinder',name:'Kindergarten',tag:'Growing explorers',desc:'Build patterns, count and connect.',words:['Build','Think','Discover'],motto:'Build, think, and discover!',note:['Growing minds.','Big ideas!'],art:1,color:'mint'},
  {id:'grade1',name:'1st Grade',tag:'Ready for a challenge',desc:'Solve, spell and discover more.',words:['Learn','Solve','Grow'],motto:'Learn, solve, and grow!',note:['Bright minds.','Bright futures!'],art:3,color:'lilac'}];
 const entries={
- prek:[['colors','Color Match','Find a color','colors'],['shapes','Shape Finder','Meet four friendly shapes','shapes'],['count','Count It!','Count from 1 to 5','numbers'],['letters','Letter Twins','Match capital letters','letters'],['feelings','How Do I Feel?','Happy, sad or surprised?','feelings'],['animals','Animal Sounds','Who says woof?','animals'],['size','Big & Small','Compare two shapes','shapes'],['memory','First Pairs','Find 2 matching pairs','shapes'],['patterns','What Comes Next?','Try a simple pattern','shapes']],
+ prek:[['colors','Color Match','Find a color','colors'],['shapes','Shape Finder','Find shapes and colors','shapes'],['count','Count It!','Count from 1 to 5','numbers'],['letters','Letter Twins','Match capital letters','letters'],['feelings','How Do I Feel?','Happy, sad or surprised?','feelings'],['animals','Animal Sounds','Who says woof?','animals'],['size','Big & Small','Compare two shapes','shapes'],['memory','First Pairs','Find 2 matching pairs','shapes'],['patterns','What Comes Next?','Try a simple pattern','shapes']],
  kinder:[['mix','Color Mix','Discover new colors','colors'],['shapes','Shape Detective','Count the sides','shapes'],['numbers','Number Neighbors','Numbers up to 20','numbers'],['letters','Letter Partners','Match big and small letters','letters'],['feelings','Feeling Stories','Listen to a little story','feelings'],['animals','Animal Homes','Discover where animals live','animals'],['count','Count & Add','Put two groups together','numbers'],['memory','Memory Match','Find 3 matching pairs','shapes'],['patterns','Pattern Builder','Look for a repeating pattern','shapes']],
  grade1:[['math','Math Blast','Add within 20','numbers'],['subtract','Take Away','Subtract within 20','numbers'],['letters','Spell It!','Complete a familiar word','letters'],['feelings','Kind Choices','Think about helping others','feelings'],['animals','Animal Detective','Listen for the clues','animals'],['count','Groups of Ten','Count tens and ones','numbers'],['memory','Memory Challenge','Find 4 matching pairs','shapes'],['patterns','Pattern Puzzles','Discover the missing piece','shapes'],['mix','Color Lab','Explore color combinations','colors']]
 };
@@ -31,6 +31,29 @@ function choice(label,key=label,visual=''){return {label,key,visual};}
 function q(prompt,visual,options,answer){return{prompt,visual,options:shuffle(options),answer};}
 function numberOptions(n,min=0,max=40){const pool=Array.from({length:max-min+1},(_,i)=>i+min).filter(v=>v!==n);return shuffle([n,...shuffle(pool).slice(0,3)]).map(n=>choice(String(n),n));}
 function counters(n){return `<div class="counters">${Array.from({length:n},(_,i)=>`<span class="counter" style="--i:${i}"></span>`).join('')}</div>`;}
+/* Pre-K Shape Finder: a shuffled deck of every shape and color+shape prompt, dealt without repeats. */
+const prekShapes=['circle','square','triangle','star','rectangle'];
+const prekColors=[...colors,['Pink','#f497b6']];
+let shapeDeck=[],lastShape='';
+function prekShape(){
+ if(!shapeDeck.length){
+  const all=[...prekShapes.map(s=>[null,s]),...prekShapes.flatMap(s=>prekColors.map(c=>[c,s]))];
+  shapeDeck=shuffle(all);
+  if(shapeDeck.length>1&&shapeDeck[shapeDeck.length-1].join()===lastShape)shapeDeck.unshift(shapeDeck.pop());
+ }
+ const [c,s]=shapeDeck.pop();lastShape=[c,s].join();
+ const item=(col,sh)=>choice(cap(col?`${col[0].toLowerCase()} ${sh}`:sh),`${col?col[0]:''}-${sh}`,shape(sh,(col||pick(prekColors))[1]));
+ if(!c){
+  const others=shuffle(prekShapes.filter(v=>v!==s)).slice(0,3),tints=shuffle(prekColors);
+  return q(`Find the ${s}.`,'',[s,...others].map((v,i)=>choice(cap(v),v,shape(v,tints[i][1]))),s);
+ }
+ const target=`${c[0]}-${s}`,opts=[[c,s]],used=new Set([target]);
+ const add=(col,sh)=>{const k=`${col[0]}-${sh}`;if(!used.has(k)&&opts.length<4){used.add(k);opts.push([col,sh]);}};
+ add(pick(prekColors.filter(v=>v!==c)),s);
+ add(c,pick(prekShapes.filter(v=>v!==s)));
+ while(opts.length<4)add(pick(prekColors),pick(prekShapes));
+ return q(`Find the ${c[0].toLowerCase()} ${s}.`,'',opts.map(([col,sh])=>item(col,sh)),target);
+}
 function generate(grade,kind){
  const difficulty={prek:0,kinder:1,grade1:2}[grade];
  if(difficulty===undefined)throw new Error('Unknown grade');
@@ -44,7 +67,8 @@ function generate(grade,kind){
   return q('What color do these paints make?',`<div class="mixing">${blob(color(a))}<span>+</span>${blob(color(b))}</div>`,[colors.find(v=>v[0]===c),...shuffle(colors.filter(v=>v[0]!==c)).slice(0,3)].map(v=>choice(v[0],v[0],blob(v[1],42))),c);
  }
  if(kind==='shapes'){
-  const s=pick(difficulty?['circle','square','triangle']:shapes);
+  if(!difficulty)return prekShape();
+  const s=pick(['circle','square','triangle']);
   const prompt=difficulty?({circle:'Find the shape with no straight sides.',square:'Find the shape with 4 equal sides.',triangle:'Find the shape with 3 sides.'}[s]):`Find the ${s}.`;
   return q(prompt,'',shapes.map((v,i)=>choice(cap(v),v,shape(v,colors[i][1]))),s);
  }
