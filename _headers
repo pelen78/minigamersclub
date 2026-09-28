@@ -1,3 +1,9 @@
 # Revalidate replaced voice recordings and music instead of keeping old audio.
 /audio/*
   Cache-Control: no-cache, must-revalidate
+
+# Always check for a newer page code and styles (unchanged files are not re-downloaded).
+/*.js
+  Cache-Control: no-cache, must-revalidate
+/*.css
+  Cache-Control: no-cache, must-revalidate

@@ -103,7 +103,7 @@ body[data-screen=games] main{padding-top:0}
 .panel-motto{margin:3px 0 0;color:#5f8c95;font:600 clamp(18px,1.5vw,25px)/1 'Caveat',cursive}
 body[data-screen=games] .game-tiles{grid-template-columns:repeat(3,minmax(0,1fr));gap:clamp(10px,1.8vh,18px);margin:0}
 body[data-screen=games] .game-tile{border:3px solid #fffffff0;border-radius:24px;box-shadow:inset 0 2px 5px #fff8,0 4px 0 #8f9f8a2b,0 12px 22px #44584419}
-body[data-screen=games] .game-tile .tile-title{display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:center;column-gap:8px;text-align:left;min-height:0;padding:10px 12px 11px 16px;font-size:clamp(17px,1.45vw,24px);letter-spacing:-.4px}
+body[data-screen=games] .game-tile .tile-title{display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:center;column-gap:8px;text-align:left;min-height:0;padding:clamp(6px,1.1vh,11px) 12px clamp(7px,1.2vh,12px) 16px;background:#fffdf8;border-top:0;box-shadow:none;font-size:clamp(17px,1.45vw,24px);letter-spacing:-.4px}
 body[data-screen=games] .game-tile .tile-name{font-size:inherit;line-height:1.1}
 body[data-screen=games] .game-tile .tile-title:after{content:'';grid-column:2;width:34px;height:34px;border-radius:50%;background:#ffe9a6 url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23165266' stroke-width='3.2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M10 6l6 6-6 6'/%3E%3C/svg%3E") 55% 50%/16px no-repeat;box-shadow:0 3px 0 #ebc86a;transition:transform .2s}
 body[data-screen=games] .game-tile:hover .tile-title:after{transform:translateX(3px)}
@@ -111,7 +111,7 @@ body[data-screen=games] .home-tagline{margin-top:clamp(10px,2vh,18px)}
 body .crumb button{display:inline-flex;align-items:center;gap:10px;padding:11px 22px 11px 16px;border:2px solid #fff;border-radius:999px;background:#fffdf6f2;color:#15485a;font:600 18px var(--display);box-shadow:0 4px 0 #a4b29b40,0 10px 22px #34503e1f}
 body .crumb button:hover{background:#fff}
 .crumb-arrow{width:20px;height:20px;fill:none;stroke:#1b6d86;stroke-width:3.2;stroke-linecap:round;stroke-linejoin:round}
-@media(min-width:761px){body[data-screen=games] .game-tile .sprite{width:min(100%,clamp(70px,calc((100svh - 470px)/3),175px))}}
+@media(min-width:761px){body[data-screen=games] .game-tile .sprite{width:min(100%,clamp(70px,calc((100svh - 435px)/3),200px))}}
 @media(max-width:1100px) and (min-width:761px){body[data-screen=games] .game-tile .tile-title{padding:8px 8px 9px 11px;font-size:clamp(15px,1.8vw,19px)}body[data-screen=games] .game-tile .tile-title:after{width:28px;height:28px;background-size:14px}}
 @media(max-width:760px){body[data-screen=games] .game-tiles{grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}body[data-screen=games] .game-tile .tile-title{padding:8px 6px 9px 10px;font-size:16px}body[data-screen=games] .game-tile .tile-title:after{width:24px;height:24px;background-size:12px;box-shadow:0 2px 0 #ebc86a}.panel-motto{font-size:17px}body .crumb button{font-size:15px;padding:9px 16px 9px 12px}.crumb-arrow{width:16px;height:16px}}
 @media(max-width:360px){body[data-screen=games] .game-tile .tile-title:after{content:none}body[data-screen=games] .game-tile .tile-title{grid-template-columns:1fr;font-size:14px;padding:7px 6px 8px 8px;letter-spacing:-.5px}}
@@ -148,3 +148,12 @@ body[data-screen=play] .play-actions .listen svg{width:22px;height:22px;fill:cur
 body[data-screen=play] .play-actions .back-games{background:#fff;border:2px solid #e6ebe2;box-shadow:0 4px 0 #d9e2d5,0 8px 16px #44584412}
 .back-arrow{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:2.6;stroke-linecap:round;stroke-linejoin:round}
 @media(max-width:760px){body[data-screen=play] .crumb{display:none}.q-spark{display:none}body[data-screen=play] .play-panel{border-radius:26px;padding:16px 14px}body[data-screen=play] .play-actions button{padding:9px 16px;font-size:15px}}
+/* Level page details closer to the mockup */
+body[data-screen=games] .heading-accent{width:clamp(34px,3vw,50px)}
+body[data-screen=games] .panel-heading{margin-bottom:clamp(8px,1.6vh,16px)}
+body[data-screen=games] .panel-title .scene-title{font-size:clamp(30px,3.4vw,54px)}
+body[data-screen=games] .panel-note{font-size:clamp(18px,1.6vw,27px)}
+body[data-screen=games] .home-panel{padding-top:clamp(14px,2.4vh,22px);padding-bottom:clamp(14px,2.4vh,22px)}
+body[data-screen=games] .crumb button{font:700 20px var(--display);padding:14px 28px 14px 20px;gap:14px}
+body[data-screen=games] .crumb-arrow{width:24px;height:24px;stroke:#15485a;stroke-width:3.6}
+@media(max-width:760px){body[data-screen=games] .crumb button{font-size:15px;padding:9px 16px 9px 12px}body[data-screen=games] .crumb-arrow{width:16px;height:16px}}
