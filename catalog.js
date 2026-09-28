@@ -6,9 +6,9 @@ const categories=[
  {id:'numbers',name:'Numbers',art:2,color:'lilac'}, {id:'letters',name:'Letters',art:3,color:'pink'},
  {id:'feelings',name:'Feelings',art:4,color:'yellow'}, {id:'animals',name:'Animals',art:5,color:'mint'}
 ];
-const grades=[{id:'prek',name:'Pre-K',tag:'Little discoveries',desc:'Match, notice and count to 5.',words:['Explore','Create','Play'],art:0,color:'peach'},
- {id:'kinder',name:'Kindergarten',tag:'Growing explorers',desc:'Build patterns, count and connect.',words:['Build','Think','Discover'],art:1,color:'mint'},
- {id:'grade1',name:'1st Grade',tag:'Ready for a challenge',desc:'Solve, spell and discover more.',words:['Learn','Solve','Grow'],art:3,color:'lilac'}];
+const grades=[{id:'prek',name:'Pre-K',tag:'Little discoveries',desc:'Match, notice and count to 5.',words:['Explore','Create','Play'],motto:'Explore, create, and play!',note:['Little learners.','Big possibilities!'],art:0,color:'peach'},
+ {id:'kinder',name:'Kindergarten',tag:'Growing explorers',desc:'Build patterns, count and connect.',words:['Build','Think','Discover'],motto:'Build, think, and discover!',note:['Growing minds.','Big ideas!'],art:1,color:'mint'},
+ {id:'grade1',name:'1st Grade',tag:'Ready for a challenge',desc:'Solve, spell and discover more.',words:['Learn','Solve','Grow'],motto:'Learn, solve, and grow!',note:['Bright minds.','Bright futures!'],art:3,color:'lilac'}];
 const entries={
  prek:[['colors','Color Match','Find a color','colors'],['shapes','Shape Finder','Meet four friendly shapes','shapes'],['count','Count It!','Count from 1 to 5','numbers'],['letters','Letter Twins','Match capital letters','letters'],['feelings','How Do I Feel?','Happy, sad or surprised?','feelings'],['animals','Animal Sounds','Who says woof?','animals'],['size','Big & Small','Compare two shapes','shapes'],['memory','First Pairs','Find 2 matching pairs','shapes'],['patterns','What Comes Next?','Try a simple pattern','shapes']],
  kinder:[['mix','Color Mix','Discover new colors','colors'],['shapes','Shape Detective','Count the sides','shapes'],['numbers','Number Neighbors','Numbers up to 20','numbers'],['letters','Letter Partners','Match big and small letters','letters'],['feelings','Feeling Stories','Listen to a little story','feelings'],['animals','Animal Homes','Discover where animals live','animals'],['count','Count & Add','Put two groups together','numbers'],['memory','Memory Match','Find 3 matching pairs','shapes'],['patterns','Pattern Builder','Look for a repeating pattern','shapes']],
