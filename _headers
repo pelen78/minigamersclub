@@ -1,0 +1,3 @@
+# Revalidate replaced voice recordings and music instead of keeping old audio.
+/audio/*
+  Cache-Control: no-cache, must-revalidate
