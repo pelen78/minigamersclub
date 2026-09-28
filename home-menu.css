@@ -1,0 +1,38 @@
+/* Home menu inspired by the user's classroom reference. */
+body[data-screen=grades] .layout{padding:42px 7% 35px 26%;display:block;max-width:1730px}
+body[data-screen=grades] main{padding:0;display:block}
+body[data-screen=grades] .level-panel,body[data-screen=grades] .home-stories{background:#fffef2ed;border:2px solid #fff;border-radius:28px;padding:18px;box-shadow:0 7px 0 #a4b29b33,0 12px 25px #34503e24}
+body[data-screen=grades] .level-panel{background:#f1f8e9f0}
+body[data-screen=grades] .scene-title{background:none;border:0;box-shadow:none;margin:0 0 16px;padding:0 8px;font-size:clamp(23px,2.5vw,36px)}
+body[data-screen=grades] .scene-title:before{content:'✦';color:#efbb44;margin-right:12px}
+body[data-screen=grades] .grade-tiles .sprite{width:min(100%,185px)}
+body[data-screen=grades] .grade-tiles .tile-title{justify-content:flex-start;padding:12px;font-size:clamp(19px,1.8vw,28px);gap:5px}
+body[data-screen=grades] .grade-tiles .tile-title:after{content:'›';display:grid;place-items:center;margin-left:auto;flex-shrink:0;width:32px;height:32px;border-radius:50%;background:#fff9;color:#16767c;font-size:28px}
+body[data-screen=grades] .home-stories{margin:16px 0 0;background:#fffcf5f5}
+.home-stories .stories-heading{display:flex;gap:17px;align-items:center;margin:0 2px 14px}
+.home-stories .stories-heading h2{padding:0;margin:0;border:0;background:none;box-shadow:none;font-size:30px;text-align:left}
+.stories-heading h2>span{color:#e3b442;margin-right:8px}
+.stories-heading p{margin:0;color:#6e929b;font:500 15px var(--body);font-style:italic}
+.story-filters{display:grid;grid-template-columns:.5fr 1fr 1fr;gap:6px;background:#e9eef0;border:2px solid #fff;border-radius:22px;padding:4px;margin-bottom:15px}
+.story-filters button{border:0;border-radius:17px;background:transparent;padding:10px 6px;font:600 19px var(--display);min-height:46px;color:#486d7e}
+.story-filters button[aria-pressed=true]{background:#ffdc72;color:#124855;box-shadow:0 3px 6px #7b653d22}
+.story-filters button[data-filter=read-along][aria-pressed=true]{background:#d6daf3}
+.story-filters button>span{margin-right:8px}
+.home-stories .story-shelf{grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}
+.home-stories .story-cover{display:flex;flex-direction:column;gap:0;align-items:stretch;padding:0;border:3px solid white;border-radius:21px;overflow:hidden;background:#fffdf6}
+.home-stories .story-cover[hidden]{display:none}
+.home-stories .story-cover-art{width:100%;height:123px;flex:0 0 123px;border-radius:0;background:radial-gradient(ellipse at 35% 5%,#faffd5,transparent 55%),linear-gradient(#9cded3,#98c976)}
+.home-stories .seed-cover{background:radial-gradient(ellipse at 70% 30%,#ffffce,transparent 65%),linear-gradient(#b5d8e7,#94cf84)}
+.home-stories .moonlight-cover{background:radial-gradient(ellipse at 70% 30%,#8199b8,transparent 65%),linear-gradient(#1b3859,#486b8c)}
+.home-stories .story-cover-art .story-glup{width:126px;left:3%;bottom:-19px}
+.home-stories .cover-bug{width:95px;right:2%;bottom:-5px}
+.home-stories .seed-cover .cover-bug{width:86px;right:5%;bottom:-3px}
+.home-stories .moonlight-cover .cover-bug{width:73px;right:6%;bottom:12px}
+.home-stories .story-cover-title{position:relative;padding:10px 41px 12px 12px;font-size:clamp(16px,1.4vw,21px);line-height:1.15}
+.home-stories .story-cover-prefix{font:500 14px var(--display);color:inherit;margin-bottom:3px}
+.home-stories .story-open-icon{position:absolute;right:8px;top:18px;display:grid;place-items:center;margin:0;width:29px;height:29px;border-radius:50%;background:#ffebac;font-size:27px;line-height:1;color:#165266}
+body[data-screen=grades] .top-actions{flex-direction:row;right:14px;top:12px;gap:8px}
+body[data-screen=grades] .top-actions .icon-button{width:48px;height:48px}
+@media(min-width:761px){body[data-screen=grades] .glup-panel{width:25%;bottom:108px}body[data-screen=grades] .speech{position:absolute;clip:auto;overflow:visible;white-space:normal;width:82%;height:auto;min-height:0;max-width:250px;margin:0;left:10%;top:-78px;padding:14px;border-radius:24px;font-size:19px;box-shadow:0 5px 14px #546e3720}body[data-screen=grades] .brand{width:24vw;max-width:325px}}
+@media(max-width:1100px) and (min-width:761px){body[data-screen=grades] .layout{padding-left:25%;padding-right:3%;padding-top:80px}.home-stories .story-shelf{gap:8px}.home-stories .story-cover-art .story-glup{width:110px;left:-7%}.home-stories .cover-bug{width:76px}.home-stories .seed-cover .cover-bug{width:68px}.home-stories .moonlight-cover .cover-bug{width:55px}.home-stories .story-cover-title{font-size:16px;padding-left:8px;padding-right:33px}.home-stories .story-cover-prefix{font-size:12px}.home-stories .story-open-icon{right:4px;width:25px;height:25px}}
+@media(max-width:760px){body[data-screen=grades] .layout{padding:0 12px 24px;min-height:0}body[data-screen=grades] .level-panel,body[data-screen=grades] .home-stories{padding:12px;border-radius:23px}body[data-screen=grades] .top-actions{flex-direction:column}body[data-screen=grades] .grade-tiles .sprite{width:78px}body[data-screen=grades] .grade-tiles .tile-title{font-size:20px;padding:8px 4px}body[data-screen=grades] .grade-tiles .tile-title:after{width:26px;height:26px;margin-right:4px}body[data-screen=grades] .scene-title{font-size:23px;padding:0;margin-bottom:12px}.home-stories .stories-heading{gap:10px}.home-stories .stories-heading h2{font-size:25px}.stories-heading p{font-size:12px}.story-filters{gap:3px;border-radius:17px}.story-filters button{font-size:14px;padding:8px 4px}.story-filters button>span{display:none}.home-stories .story-shelf{grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}.home-stories .story-cover-art{height:110px;flex-basis:110px}.home-stories .story-cover-art .story-glup{width:104px;left:-16px;bottom:-7px}.home-stories .cover-bug{width:75px;right:-8px}.home-stories .seed-cover .cover-bug{width:67px;right:0}.home-stories .moonlight-cover .cover-bug{width:48px;right:0;bottom:28px}.home-stories .story-cover-title{font-size:16px;padding:9px 7px 10px}.home-stories .story-cover-prefix{font-size:11px}.home-stories .story-open-icon{display:none}}
