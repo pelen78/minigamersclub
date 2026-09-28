@@ -11,7 +11,7 @@ try{musicEnabled=localStorage.getItem('mini-playroom-music')!=='off';}catch{}
 backgroundMusic.volume=.1;
 function musicUI(){const b=$('#music-button');b.dataset.muted=String(!musicEnabled);b.setAttribute('aria-pressed',String(musicEnabled));b.setAttribute('aria-label',musicEnabled?'Mute music':'Play music');}
 function startMusic(){
- if(!musicEnabled||document.hidden||!musicStarted)return;
+ if(!musicEnabled||document.hidden||!musicStarted||state.screen==='story')return;
  // A separate gain also keeps music quiet on mobile browsers that ignore media volume.
  if(!musicContext){try{const Context=window.AudioContext||window.webkitAudioContext;if(Context){musicContext=new Context();musicGain=musicContext.createGain();musicGain.gain.value=.1;musicContext.createMediaElementSource(backgroundMusic).connect(musicGain);musicGain.connect(musicContext.destination);backgroundMusic.volume=1;}}catch{musicContext=null;backgroundMusic.volume=.1;}}
  musicContext?.resume().catch(()=>{});
@@ -19,7 +19,7 @@ function startMusic(){
 }
 function toggleMusic(){musicEnabled=!musicEnabled;try{localStorage.setItem('mini-playroom-music',musicEnabled?'on':'off');}catch{}musicUI();if(musicEnabled)startMusic();else{backgroundMusic.pause();musicContext?.suspend().catch(()=>{});}}
 // Start only after a real interaction; never compete with browser autoplay rules.
-document.addEventListener('click',event=>{musicStarted=true;if(event.target.closest('[data-action="music"]'))return;startMusic();});
+document.addEventListener('click',event=>{musicStarted=true;if(event.target.closest('[data-action="music"], [data-action="story"]'))return;startMusic();});
 window.addEventListener('pagehide',()=>{backgroundMusic.pause();musicContext?.suspend().catch(()=>{});});
 window.addEventListener('pageshow',()=>{startMusic();});
 // Refresh replaced recordings on each visit; reuse them while this page stays open.
@@ -30,7 +30,7 @@ const escapeHtml=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>'
 function sprite(art,extra=''){return `<span class="sprite category-art ${extra}" style="--x:${art%3*50}%;--y:${Math.floor(art/3)*100}%" aria-hidden="true"></span>`;}
 function later(fn,ms){const session=state.session;const timer=setTimeout(()=>{timers.delete(timer);if(session===state.session)fn();},ms);timers.add(timer);}
 function stopAudio(){if(voice){voice.pause();voice.currentTime=0;voice=null;}window.speechSynthesis?.cancel();}
-function leave(){state.session++;for(const timer of timers)clearTimeout(timer);timers.clear();stopAudio();state.locked=false;}
+function leave(){window.MiniStory?.close();state.session++;for(const timer of timers)clearTimeout(timer);timers.clear();stopAudio();state.locked=false;}
 function speak(text){stopAudio();if(!state.sound||!('speechSynthesis' in window))return;const utterance=new SpeechSynthesisUtterance(text);utterance.lang='en-US';utterance.rate=.86;utterance.pitch=1.04;const english=window.speechSynthesis.getVoices().find(v=>v.lang==='en-US');if(english)utterance.voice=english;window.speechSynthesis.speak(utterance);}
 function recording(file,fallback){stopAudio();if(!state.sound)return;const session=state.session;voice=new Audio(`audio/${file}.mp3?v=${voiceRevision}`);voice.volume=.8;voice.play().catch(()=>{if(session===state.session)speak(fallback);});}
 function chime(){if(!state.sound)return;try{audioContext??=new(window.AudioContext||window.webkitAudioContext)();audioContext.resume();const now=audioContext.currentTime;[523,659,784].forEach((frequency,i)=>{const o=audioContext.createOscillator(),g=audioContext.createGain();o.frequency.value=frequency;g.gain.setValueAtTime(.0001,now+i*.085);g.gain.exponentialRampToValueAtTime(.06,now+i*.085+.02);g.gain.exponentialRampToValueAtTime(.0001,now+i*.085+.3);o.connect(g);g.connect(audioContext.destination);o.start(now+i*.085);o.stop(now+i*.085+.31);});}catch{}}
@@ -40,8 +40,8 @@ function focusMain(){document.body.dataset.screen=state.screen;requestAnimationF
 function crumb(){return `<nav class="crumb" aria-label="Back"><button data-action="${state.screen==='games'?'home':'games'}">‹ ${state.screen==='games'?'Levels':'Games'}</button></nav>`;}
 function heading(eyebrow,title,sub){return `<h1 class="scene-title">${title}</h1>`;}
 function showGrades(){leave();state.screen='grades';state.grade=null;state.category=null;state.game=null;$('.glup-panel').classList.remove('playing');glup("Hi! I'm Glup. Which level shall we explore?");
- $('#main').innerHTML=heading('A little play. A big discovery.','Choose your level','Choose a level. There’s something wonderful to discover in each one.')+`<div class="tiles grade-tiles">${C.grades.map(g=>`<button class="tile ${g.color}" data-action="grade" data-grade="${g.id}">${sprite(g.art)}<span class="tile-title">${g.name}</span></button>`).join('')}</div>`;
- focusMain();}
+ $('#main').innerHTML=heading('A little play. A big discovery.','Choose your level','Choose a level. There’s something wonderful to discover in each one.')+`<div class="tiles grade-tiles">${C.grades.map(g=>`<button class="tile ${g.color}" data-action="grade" data-grade="${g.id}">${sprite(g.art)}<span class="tile-title">${g.name}</span></button>`).join('')}</div>`+window.MiniStory.card();
+ focusMain();startMusic();}
 function showGames(){leave();state.screen='games';state.category='all';$('.glup-panel').classList.remove('playing');const list=C.games[state.grade];const name=C.grades.find(g=>g.id===state.grade).name;glup('Pick a game. I’ll be right here with you!');
  $('#main').innerHTML=crumb()+heading(C.grades.find(g=>g.id===state.grade).name,name,'Choose an activity. You can come back and try another any time.')+`<div class="tiles">${list.map(g=>{const cat=C.categories.find(c=>c.id===g.category);return `<button class="tile game-tile ${cat.color}" data-action="start" data-game="${g.id}">${state.completed[state.grade+':'+g.id]?'<span class="check-mark" aria-label="Played">✓</span>':''}${sprite(g.art)}<span class="tile-title">${g.name}</span></button>`;}).join('')}</div>`;
  recording('glup-selectgame','Pick a game.');focusMain();}
@@ -62,6 +62,7 @@ function confetti(){if(matchMedia('(prefers-reduced-motion: reduce)').matches)re
 function win(){stopAudio();state.screen='win';state.locked=true;state.completed[state.grade+':'+state.game.id]=true;try{localStorage.setItem('mini-playroom-completed',JSON.stringify(state.completed));}catch{}glup('Look what you discovered! I’m proud of you.','cheer');$('#main').innerHTML=crumb()+`<section class="play-panel"><div class="win-star" aria-hidden="true">★</div><h1>You did it!</h1><p class="win-copy">${state.game.name} complete.</p><p class="subtitle">A little practice makes a big difference.</p><div class="play-actions"><button class="primary" data-action="start" data-game="${state.game.id}">Play again</button><button class="secondary" data-action="games" data-category="${state.category||'all'}">More games →</button></div></section>`;confetti();speak('You did it! Great exploring!');focusMain();}
 document.addEventListener('click',event=>{const button=event.target.closest('button[data-action]');if(!button||button.disabled)return;switch(button.dataset.action){
  case 'home':showGrades();break;
+ case 'story':leave();state.screen='story';backgroundMusic.pause();musicContext?.suspend().catch(()=>{});focusMain();window.MiniStory.open($('#main'),()=>showGrades());break;
  case 'grade':state.grade=button.dataset.grade;showGames();break;
  case 'games':showGames();break;
  case 'start':play(button.dataset.game);break;
