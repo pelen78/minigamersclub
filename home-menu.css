@@ -131,9 +131,10 @@ body[data-screen=play] .question{margin-left:0;margin-right:0;font:700 clamp(22p
 .q-spark{flex-shrink:0;width:clamp(18px,1.8vw,28px);aspect-ratio:1;background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath fill='%23f6c33b' d='M12 1c1 6 5 10 11 11-6 1-10 5-11 11-1-6-5-10-11-11 6-1 10-5 11-11z'/%3E%3C/svg%3E") center/contain no-repeat;filter:drop-shadow(0 2px 0 #e2a52b55)}
 .q-spark-a{transform:translateY(-10px) rotate(-8deg)}.q-spark-b{transform:translateY(8px) rotate(10deg);width:clamp(15px,1.5vw,24px)}
 body[data-screen=play] .question-symbol{position:relative;display:inline-block;color:#f5b72c;text-shadow:0 3px 0 #dd961d66}
-body[data-screen=play] .question-symbol:before,body[data-screen=play] .question-symbol:after{content:'';position:absolute;top:22%;width:.34em;height:.5em;background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 30' fill='none' stroke='%23f5b72c' stroke-width='4' stroke-linecap='round'%3E%3Cpath d='M16 6L5 11M16 24L5 19'/%3E%3C/svg%3E") center/contain no-repeat}
-body[data-screen=play] .question-symbol:before{right:100%;margin-right:.1em}
-body[data-screen=play] .question-symbol:after{left:100%;margin-left:.1em;transform:scaleX(-1)}
+body[data-screen=play] .question-symbol:before,body[data-screen=play] .question-symbol:after{content:'';position:absolute;top:14%;width:.3em;height:.66em;background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 30' fill='none' stroke='%23f5b72c' stroke-width='4' stroke-linecap='round'%3E%3Cpath d='M3 3l8 5M3 27l8-5'/%3E%3C/svg%3E") center/contain no-repeat}
+body[data-screen=play] .question-symbol:before{right:100%;margin-right:.14em}
+body[data-screen=play] .question-symbol:after{left:100%;margin-left:.14em;transform:scaleX(-1)}
+body[data-screen=play] .glup-panel:after{content:none}
 body[data-screen=play] .answers{gap:clamp(12px,2vh,20px) clamp(14px,1.6vw,22px);max-width:760px}
 body[data-screen=play] .answer{background:#fff;border:2px solid #eef1ea;border-radius:24px;box-shadow:0 5px 0 #d9e2d5,0 12px 22px #44584412;font:700 clamp(18px,1.6vw,24px) var(--display);color:var(--ink)}
 body[data-screen=play] .answer:hover:not(:disabled){border-color:#9fd6c9;transform:translateY(-3px)}
