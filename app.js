@@ -22,6 +22,8 @@ function toggleMusic(){musicEnabled=!musicEnabled;try{localStorage.setItem('mini
 document.addEventListener('click',event=>{musicStarted=true;if(event.target.closest('[data-action="music"]'))return;startMusic();});
 window.addEventListener('pagehide',()=>{backgroundMusic.pause();musicContext?.suspend().catch(()=>{});});
 window.addEventListener('pageshow',()=>{startMusic();});
+// Refresh replaced recordings on each visit; reuse them while this page stays open.
+const voiceRevision=Date.now().toString(36);
 const total=6;
 const speaker='<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9h4l5-4v14l-5-4H4zM17 8q5 4 0 8"/></svg>';
 const escapeHtml=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
@@ -30,7 +32,7 @@ function later(fn,ms){const session=state.session;const timer=setTimeout(()=>{ti
 function stopAudio(){if(voice){voice.pause();voice.currentTime=0;voice=null;}window.speechSynthesis?.cancel();}
 function leave(){state.session++;for(const timer of timers)clearTimeout(timer);timers.clear();stopAudio();state.locked=false;}
 function speak(text){stopAudio();if(!state.sound||!('speechSynthesis' in window))return;const utterance=new SpeechSynthesisUtterance(text);utterance.lang='en-US';utterance.rate=.86;utterance.pitch=1.04;const english=window.speechSynthesis.getVoices().find(v=>v.lang==='en-US');if(english)utterance.voice=english;window.speechSynthesis.speak(utterance);}
-function recording(file,fallback){stopAudio();if(!state.sound)return;const session=state.session;voice=new Audio(`audio/${file}.mp3?v=73f007a0d20f`);voice.volume=.8;voice.play().catch(()=>{if(session===state.session)speak(fallback);});}
+function recording(file,fallback){stopAudio();if(!state.sound)return;const session=state.session;voice=new Audio(`audio/${file}.mp3?v=${voiceRevision}`);voice.volume=.8;voice.play().catch(()=>{if(session===state.session)speak(fallback);});}
 function chime(){if(!state.sound)return;try{audioContext??=new(window.AudioContext||window.webkitAudioContext)();audioContext.resume();const now=audioContext.currentTime;[523,659,784].forEach((frequency,i)=>{const o=audioContext.createOscillator(),g=audioContext.createGain();o.frequency.value=frequency;g.gain.setValueAtTime(.0001,now+i*.085);g.gain.exponentialRampToValueAtTime(.06,now+i*.085+.02);g.gain.exponentialRampToValueAtTime(.0001,now+i*.085+.3);o.connect(g);g.connect(audioContext.destination);o.start(now+i*.085);o.stop(now+i*.085+.31);});}catch{}}
 function soundUI(){const b=$('#sound-button');b.dataset.muted=String(!state.sound);b.setAttribute('aria-label',state.sound?'Turn sound off':'Turn sound on');}
 function glup(message,pose='idle'){const g=$('#glup');$('#glup-message').textContent=message;g.style.setProperty('--x',pose==='cheer'?'50%':pose==='think'?'100%':'0%');g.className=`sprite glup ${pose}`;}
