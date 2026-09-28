@@ -2,7 +2,7 @@
 /* Word timings [start,end] in seconds, generated from each narration recording. */
 const moonlightWordTimes=[[[0.0,0.22],[0.22,0.52],[0.52,1.04],[1.68,1.82],[1.82,2.12],[2.12,2.22],[2.22,2.52],[2.52,2.88],[2.88,3.2],[3.2,3.58],[3.58,3.68],[3.68,3.96]],[[0.0,0.26],[0.8,1.28],[1.28,1.42],[1.42,1.54],[1.54,1.78],[1.78,2.12],[3.42,3.46],[3.46,3.58],[3.58,3.72],[3.72,4.2],[4.2,4.62],[4.62,4.94],[4.94,5.22]],[[0.0,0.32],[0.32,0.66],[0.66,0.9],[0.9,1.08],[2.3,2.3],[2.64,2.82],[2.82,3.1],[3.1,3.46],[3.46,3.62],[3.62,3.98],[3.98,4.38]],[[0.0,0.18],[0.18,0.44],[0.44,1.16],[1.16,1.4],[1.4,1.78],[1.78,2.38],[2.38,2.68],[2.68,2.98],[2.98,3.18],[3.18,3.56],[3.56,3.94]],[[0.0,0.18],[0.18,0.38],[0.38,1.08],[1.08,1.26],[1.26,1.38],[1.38,1.66],[1.66,2.02],[2.02,2.16],[2.16,2.4],[2.4,2.8]],[[0.0,0.2],[0.46,0.54],[0.74,0.96],[0.96,1.16],[1.16,1.5],[1.5,2.02],[2.02,2.2],[2.2,2.44],[2.44,2.88],[2.88,3.36],[3.36,3.72]],[[0.0,0.14],[0.14,0.3],[0.3,0.6],[0.6,1.08],[1.68,1.82],[1.82,1.94],[1.94,2.12],[2.12,2.42],[2.42,2.8],[2.8,3.0],[3.0,3.24],[3.24,3.68],[3.68,4.02],[4.02,4.34]],[[0.0,0.28],[0.64,0.94],[0.94,1.28],[1.28,1.64],[1.64,2.34],[2.84,2.96],[2.96,3.18],[3.18,3.6],[3.6,4.14],[4.14,4.54],[4.54,4.8]],[[0.0,0.24],[0.24,0.48],[0.48,0.78],[2.08,2.1],[2.1,2.32],[2.32,2.58],[2.58,2.88],[2.88,3.18],[3.64,4.12],[4.12,4.46],[4.46,4.8],[4.8,5.62],[5.62,5.84],[5.84,6.12],[6.12,6.72],[6.72,7.02],[7.02,7.24]]];
 window.MoonlightStory={
- id:'glup-moonlight-wish',title:'Glup and the Moonlight Wish',music:encodeURI('audio/read aloud moonlight wish/Glup_s_Moonlight_Stroll.mp3'),format:'read-along',theme:'moonlight',
+ id:'glup-moonlight-wish',title:'Glup and the Moonlight Wish',music:encodeURI('audio/read aloud moonlight wish/moonlight-music-soft.mp3'),format:'read-along',theme:'moonlight',
  scenes:[
   {id:'light',title:'A Little Light',text:'One quiet night, Glup saw a tiny light shining in the grass.',description:'Glup discovers a tiny glowing star on the grass beneath a quiet night sky.',talk:{who:'glup',line:'glup1'}},
   {id:'lost',title:'A Lost Star',text:'Oh! It was a little star. And it was very far from home.',description:'Glup looks gently at a sad little star that has fallen from the sky.',talk:{who:'star',line:'star2'}},
@@ -37,7 +37,8 @@ window.ReadAlongPlayer=(()=>{
  function playNarration(){const src=book.scenes[page].audioNarration;if(!src)return;stopNarration();narration=new Audio(src);const audio=narration,times=book.scenes[page].wordTimes;talkHint(false);if(times)followWords(audio,times);audio.addEventListener('ended',()=>{if(audio===narration)talkHint(true);});narration.play().catch(()=>{});}
  function narrationButton(){return started?'<button class="narration-button" data-read-action="narration"><span aria-hidden="true">↻</span> Repeat</button>':'<button class="narration-button narration-start" data-read-action="start"><span aria-hidden="true">▶</span> Start</button>';}
  function soundOn(){try{return localStorage.getItem('mini-playroom-sound')!=='off';}catch{return true;}}
- function startMusic(){stopMusic();if(!book.music||!soundOn())return;music=new Audio(book.music);music.loop=true;music.volume=.12;music.play().catch(()=>{});}
+ // The music file is already attenuated (~19 dB); do not rely on media volume on iOS.
+ function startMusic(){stopMusic();if(!book.music||!soundOn())return;music=new Audio(book.music);music.loop=true;music.play().catch(()=>{});}
  function stopMusic(){if(music){music.pause();music=null;}}
  document.addEventListener('visibilitychange',()=>{if(!music)return;if(document.hidden)music.pause();else music.play().catch(()=>{});});
  function close(){stopNarration();stopMusic();events?.abort();events=null;root=null;}
