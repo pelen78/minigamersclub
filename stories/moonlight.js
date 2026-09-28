@@ -11,7 +11,7 @@ window.MoonlightStory={
   {id:'moon',title:'The Moon Helps',text:'The moon smiled down, and the little star began to shine brighter than ever.',description:'A smiling moon shines on Glup and the little star, which glows with warm golden light.'},
   {id:'home',title:'Back Home',text:'Then, with one bright sparkle, the little star floated back home.',description:'Glup watches the little star float up from the hill into the sky.'},
   {id:'goodnight',title:'Goodnight, Little Star',text:'Glup waved goodbye. And every night after that, one little star seemed to shine just for him.',description:'Glup rests on the hill looking up at his little star shining beside the moon.'}
- ].map(scene=>({...scene,audioNarration:null}))
+ ].map((scene,i)=>({...scene,audioNarration:encodeURI(`audio/read aloud moonlight wish/${i+1}.mp3`)}))
 };
 
 /* Non-interactive illustrations: the existing Glup sprite stays unchanged. */
@@ -27,12 +27,15 @@ window.ReadAlongPlayer=(()=>{
  let root=null,book=null,page=0,onHome=null,events=null,narration=null;
  const speaker='<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9h4l5-4v14l-5-4H4zM17 8q5 4 0 8M20 5q7 7 0 14"/></svg>';
  function stopNarration(){if(narration){narration.pause();narration=null;}}
+ function playNarration(){const src=book.scenes[page].audioNarration;if(!src)return;stopNarration();narration=new Audio(src);narration.play().catch(()=>{});}
+ function soundOn(){try{return localStorage.getItem('mini-playroom-sound')!=='off';}catch{return true;}}
  function close(){stopNarration();events?.abort();events=null;root=null;}
  function open(element,home,entry){close();root=element;onHome=home;book=entry;page=0;events=new AbortController();root.addEventListener('click',handle,{signal:events.signal});render();}
  function render(){stopNarration();const scene=book.scenes[page],last=page===book.scenes.length-1;
   root.innerHTML=`<article class="storybook readalong-book" aria-labelledby="readalong-title"><nav class="story-toolbar" aria-label="Story controls"><button class="book-home" data-read-action="home" aria-label="Back to Stories">⌂<span>Stories</span></button><span class="story-book-name">${book.title}</span><button class="narration-replay" data-read-action="narration" aria-label="Replay narration${scene.audioNarration?'':' — audio coming soon'}" title="${scene.audioNarration?'Replay narration':'Audio coming soon'}" ${scene.audioNarration?'':'disabled'}>${speaker}</button></nav><div class="readalong-page page-arrival">${window.MoonlightArt.scene(scene)}<div class="readalong-copy"><h1 id="readalong-title">${scene.title}</h1><p>${scene.text}</p></div></div><nav class="book-pager" aria-label="Book pages"><button class="page-arrow" data-read-action="back" aria-label="Back" ${page===0?'disabled':''}>‹</button><span class="story-page-number" aria-live="polite">${page+1} / ${book.scenes.length}</span>${last?'<div class="readalong-ending"><button class="readalong-again" data-read-action="restart"><span aria-hidden="true">↻</span> Read Again</button><button class="book-home" data-read-action="home" aria-label="Back to Stories">⌂<span>Back to Stories</span></button></div>':'<button class="page-arrow" data-read-action="next" aria-label="Next">›</button>'}</nav></article>`;
   root.querySelector('h1').setAttribute('tabindex','-1');root.querySelector('h1').focus({preventScroll:true});window.scrollTo({top:0,behavior:'instant'});
+  if(soundOn())playNarration();
  }
- function handle(event){const button=event.target.closest('[data-read-action]');if(!button||button.disabled)return;switch(button.dataset.readAction){case 'home':onHome();break;case 'back':if(page>0){page--;render();}break;case 'next':if(page<book.scenes.length-1){page++;render();}break;case 'restart':page=0;render();break;case 'narration':if(book.scenes[page].audioNarration){stopNarration();narration=new Audio(book.scenes[page].audioNarration);narration.play().catch(()=>{});}break;}}
+ function handle(event){const button=event.target.closest('[data-read-action]');if(!button||button.disabled)return;switch(button.dataset.readAction){case 'home':onHome();break;case 'back':if(page>0){page--;render();}break;case 'next':if(page<book.scenes.length-1){page++;render();}break;case 'restart':page=0;render();break;case 'narration':playNarration();break;}}
  return {open,close};
 })();
